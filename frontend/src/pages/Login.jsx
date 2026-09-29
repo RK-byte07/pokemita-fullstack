@@ -1,84 +1,225 @@
 // src/pages/Login.jsx
-import { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Input from '../components/ui/Input';
+import Modal from "../components/ui/Modal";
+import Icon from "../components/ui/Icon";
+import AuthVisual from "../components/AuthVisual";
 
 export default function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const { dispatch } = useAuth();
+  const [remember, setRemember] = useState(true);
+
+  const [errors, setErrors] = useState({});
+
+  const [modal, setModal] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+
+  const { login } = useAuth();
+
   const navigate = useNavigate();
+
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/';
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    setError('');
+  async function handleSubmit(event) {
+    event.preventDefault();
 
-    if (!username.trim()) return setError('El usuario es obligatorio');
-    if (password.length < 6) return setError('La contraseña debe tener mínimo 6 caracteres');
+    const nextErrors = {};
 
-    dispatch({ type: 'LOGIN', payload: { username } });
-    navigate(from, { replace: true });
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      nextErrors.email = "Ingresa un correo electrónico válido.";
+    }
+
+    if (!password) {
+      nextErrors.password = "Ingresa tu contraseña.";
+    }
+
+    setErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length) {
+      return;
+    }
+
+    setLoading(true);
+
+    const result = await login(email, password, remember);
+
+    setLoading(false);
+
+    if (!result.ok) {
+      setModal(
+        result.reason === "email"
+          ? {
+              title: "Acceso denegado",
+
+              message: "El correo ingresado no está registrado.",
+            }
+          : {
+              title: "Contraseña incorrecta",
+
+              message: "Verifica tus credenciales e intenta nuevamente.",
+            },
+      );
+
+      return;
+    }
+
+    navigate(location.state?.from?.pathname || "/simulador", {
+      replace: true,
+    });
   }
 
   return (
-    <div className="max-w-md mx-auto mt-16 px-4">
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 shadow-lg">
-        <h2 className="text-3xl font-bold text-yellow-400 mb-6 text-center">
-          Iniciar sesión
-        </h2>
+    <div className="auth-shell">
+      <AuthVisual />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
-              Usuario
-            </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-yellow-400"
-              placeholder="ash_ketchum"
-            />
+      <section
+        className="
+        flex
+        items-center
+        justify-center
+        p-6
+        sm:p-10
+        lg:p-16
+        "
+      >
+        <div className="w-full max-w-md">
+          <div className="mb-8">
+            <span className="eyebrow">ACCESO DE ENTRENADOR</span>
+
+            <h1
+              className="
+              mt-3
+              text-4xl
+              font-black
+              tracking-tight
+              text-white
+              "
+            >
+              Vuelve a la arena
+            </h1>
+
+            <p className="mt-2 text-slate-400">
+              Inicia sesión para gestionar tu equipo competitivo.
+            </p>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
-              Contraseña
-            </label>
-            <input
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+            <Input
+              label="Correo electrónico"
+              icon="mail"
+              type="email"
+              autoComplete="email"
+              placeholder="usuario@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              error={errors.email}
+            />
+
+            <Input
+              label="Contraseña"
+              icon="lock"
               type="password"
+              autoComplete="current-password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-yellow-400"
-              placeholder="••••••"
+              error={errors.password}
             />
-          </div>
 
-          {error && (
-            <div className="bg-red-500/20 border border-red-500 text-red-300 text-sm px-3 py-2 rounded-lg">
-              {error}
+            <div
+              className="
+              flex
+              items-center
+              justify-between
+              gap-4
+              text-sm
+              "
+            >
+              <label
+                className="
+                flex
+                cursor-pointer
+                items-center
+                gap-2
+                text-slate-300
+                "
+              >
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="
+                  h-4
+                  w-4
+                  accent-brand
+                  "
+                />
+                Recordarme
+              </label>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setModal({
+                    title: "Recuperación no disponible",
+
+                    message:
+                      "La recuperación de contraseña se habilitará cuando el servicio de correo esté conectado.",
+                  })
+                }
+                className="
+                font-bold
+                text-info
+                hover:text-white
+                "
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
             </div>
-          )}
 
-          <button
-            type="submit"
-            className="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-bold py-2 rounded-lg transition"
+            <button
+              disabled={loading}
+              className="
+              cta-button
+              w-full
+              "
+            >
+              {loading ? "Verificando…" : "Iniciar batalla"}
+
+              <Icon name="arrow" />
+            </button>
+          </form>
+
+          <p
+            className="
+            mt-7
+            text-center
+            text-sm
+            text-slate-400
+            "
           >
-            Entrar
-          </button>
-        </form>
+            ¿Aún no tienes perfil?{" "}
+            <Link
+              to="/register"
+              className="
+              font-black
+              text-brand
+              hover:text-brand-light
+              "
+            >
+              Crea tu cuenta
+            </Link>
+          </p>
+        </div>
+      </section>
 
-        <p className="mt-6 text-center text-slate-400 text-sm">
-          ¿No tienes cuenta?{' '}
-          <Link to="/register" className="text-yellow-400 hover:underline">
-            Regístrate
-          </Link>
-        </p>
-      </div>
+      <Modal open={!!modal} {...modal} onClose={() => setModal(null)} />
     </div>
   );
 }

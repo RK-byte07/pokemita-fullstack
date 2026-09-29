@@ -1,15 +1,41 @@
-// src/components/ModePicker.jsx
-import { useBattleStore } from '../store/battleStore';
+// frontend/src/components/ModePicker.jsx
+
+import { useBattleStore } from "../store/battleStore";
 
 export default function ModePicker({ onAuto, onManual }) {
   const speed = useBattleStore((s) => s.speed);
+
   const setSpeed = useBattleStore((s) => s.setSpeed);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-        <label className="flex items-center gap-3 text-sm text-slate-300">
+    <div
+      className="
+      max-w-3xl
+      mx-auto
+      space-y-6
+    "
+    >
+      {/* Velocidad */}
+
+      <div
+        className="
+          bg-card
+          border border-white/10
+          rounded-xl
+          p-5
+        "
+      >
+        <label
+          className="
+            flex
+            items-center
+            gap-3
+            text-sm
+            text-slate-300
+          "
+        >
           <span>Velocidad de eventos:</span>
+
           <input
             type="range"
             min="50"
@@ -17,29 +43,144 @@ export default function ModePicker({ onAuto, onManual }) {
             step="50"
             value={speed}
             onChange={(e) => setSpeed(Number(e.target.value))}
-            className="flex-1 accent-yellow-400"
+            className="
+              flex-1
+              accent-brand
+              cursor-pointer
+            "
           />
-          <span className="text-yellow-400 font-mono w-16">{speed}ms</span>
+
+          <span
+            className="
+              text-brand
+              font-mono
+              w-16
+            "
+          >
+            {speed}ms
+          </span>
         </label>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      {/* Modos */}
+
+      <div
+        className="
+          grid
+          md:grid-cols-2
+          gap-4
+        "
+      >
+        {/* IA VS IA */}
+
         <button
           onClick={onAuto}
-          className="bg-slate-800 hover:bg-slate-700 border-2 border-slate-700 hover:border-yellow-400 rounded-xl p-8 text-center transition group"
+          className="
+            bg-card
+            hover:bg-surface
+
+            border-2
+            border-white/10
+
+            hover:border-brand
+
+            rounded-xl
+
+            p-8
+
+            text-center
+
+            transition
+
+            group
+
+          "
         >
-          <div className="text-5xl mb-3">🤖</div>
-          <div className="text-2xl font-bold text-slate-100 mb-1">IA vs IA</div>
-          <div className="text-slate-400 text-sm">Ver una batalla automática</div>
+          <div
+            className="
+              text-5xl
+              mb-3
+              group-hover:scale-110
+              transition
+            "
+          >
+            🤖
+          </div>
+
+          <div
+            className="
+              text-2xl
+              font-bold
+              text-slate-100
+              mb-2
+            "
+          >
+            IA vs IA
+          </div>
+
+          <div
+            className="
+              text-slate-400
+              text-sm
+            "
+          >
+            Observa una batalla automática
+          </div>
         </button>
+
+        {/* Jugador VS IA */}
 
         <button
           onClick={onManual}
-          className="bg-slate-800 hover:bg-slate-700 border-2 border-yellow-400 rounded-xl p-8 text-center transition"
+          className="
+            bg-card
+            hover:bg-surface
+
+            border-2
+            border-brand
+
+            rounded-xl
+
+            p-8
+
+            text-center
+
+            transition
+
+            group
+
+          "
         >
-          <div className="text-5xl mb-3">🎮</div>
-          <div className="text-2xl font-bold text-yellow-400 mb-1">Combatir vs IA</div>
-          <div className="text-slate-400 text-sm">Elige tu equipo y pelea</div>
+          <div
+            className="
+              text-5xl
+              mb-3
+              group-hover:scale-110
+              transition
+            "
+          >
+            🎮
+          </div>
+
+          <div
+            className="
+              text-2xl
+              font-bold
+              text-brand
+              mb-2
+            "
+          >
+            Combatir vs IA
+          </div>
+
+          <div
+            className="
+              text-slate-400
+              text-sm
+            "
+          >
+            Construye tu equipo y compite
+          </div>
         </button>
       </div>
     </div>

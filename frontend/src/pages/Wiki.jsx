@@ -46,7 +46,10 @@ export default function Wiki() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-yellow-400 mb-2">📖 Wiki Pokemita</h1>
+        <h1 className="text-4xl font-bold text-brand mb-2">
+          📖 Wiki Pokemita
+        </h1>
+
         <p className="text-slate-400">
           Guía rápida para aprovechar al máximo el simulador
         </p>
@@ -55,22 +58,27 @@ export default function Wiki() {
       <div className="space-y-3">
         {SECCIONES.map((s) => {
           const isOpen = abierta === s.id;
+
           return (
             <div
               key={s.id}
-              className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden"
+              className="bg-card border border-white/10 rounded-lg overflow-hidden"
             >
               <button
                 onClick={() => setAbierta(isOpen ? null : s.id)}
-                className="w-full flex justify-between items-center px-5 py-4 text-left hover:bg-slate-700/50 transition"
+                className="w-full flex justify-between items-center px-5 py-4 text-left hover:bg-surface/50 transition"
               >
-                <span className="font-semibold text-slate-100">{s.titulo}</span>
-                <span className="text-yellow-400 text-xl">
+                <span className="font-semibold text-slate-100">
+                  {s.titulo}
+                </span>
+
+                <span className="text-brand text-xl">
                   {isOpen ? '−' : '+'}
                 </span>
               </button>
+
               {isOpen && (
-                <div className="px-5 pb-4 text-slate-300 border-t border-slate-700 pt-3">
+                <div className="px-5 pb-4 text-slate-300 border-t border-white/10 pt-3">
                   {s.contenido}
                 </div>
               )}
