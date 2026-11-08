@@ -1,4 +1,4 @@
-// src/store/battleStore.js
+// frontend/src/store/battleStore.js
 import { create } from 'zustand';
 
 export const useBattleStore = create((set, get) => ({
@@ -29,7 +29,11 @@ export const useBattleStore = create((set, get) => ({
   p1: { name: '---', hpPct: 100, hpCur: 0, hpMax: 100, status: '', types: [], fainted: false },
   p2: { name: '---', hpPct: 100, hpCur: 0, hpMax: 100, status: '', types: [], fainted: false },
 
-  // ---- Acciones ----
+  // WebSocket
+  socket: null,
+  isConnected: false,
+
+  // ---- Acciones Generales ----
   setMode: (mode) => set({ mode }),
   setSpeed: (speed) => set({ speed }),
 
@@ -83,4 +87,71 @@ export const useBattleStore = create((set, get) => ({
       p1: { name: '---', hpPct: 100, hpCur: 0, hpMax: 100, status: '', types: [], fainted: false },
       p2: { name: '---', hpPct: 100, hpCur: 0, hpMax: 100, status: '', types: [], fainted: false },
     }),
+
+  // ==========================================
+  // ---- ACCIONES DE WEBSOCKET ----
+  // ==========================================
+
+   connectSocket: (onEvent, onRequest, initialMessage) => {
+    const ws = new WebSocket('ws://localhost:3000');
+    
+    ws.onopen = () => {
+      console.log('✅ Conectado al WebSocket');
+      set({ isConnected: true });
+      
+      // Si hay un mensaje inicial (como start_battle), lo enviamos ya
+      if (initialMessage) {
+        ws.send(JSON.stringify(initialMessage));
+      }
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === 'battle_event') {
+          onEvent(data.event);
+        }
+        
+        if (data.type === 'request_action') {
+          onRequest(data.request, data.teamState, data.mochila);
+        }
+
+        if (data.type === 'session_created') {
+          set({ sessionId: data.sessionId });
+        }
+        
+        if (data.type === 'error') {
+          console.error('Error del servidor:', data.message);
+        }
+      } catch (err) {
+        console.error('Error parseando mensaje WS:', err);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log('❌ WebSocket desconectado');
+      set({ isConnected: false, socket: null });
+    };
+    
+    set({ socket: ws });
+    return ws;
+  },
+
+  sendSocketMessage: (msg) => {
+    const ws = get().socket;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(msg));
+    } else {
+      console.error('❌ WebSocket no está conectado');
+    }
+  },
+
+  disconnectSocket: () => {
+    const ws = get().socket;
+    if (ws) {
+      ws.close();
+      set({ socket: null, isConnected: false });
+    }
+  },
 }));

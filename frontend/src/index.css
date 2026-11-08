@@ -2,18 +2,467 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Reset básico */
+
+/* =========================
+   RESET
+========================= */
+
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
-body {
-  @apply bg-slate-900 text-slate-100 min-h-screen;
-  font-family: system-ui, -apple-system, sans-serif;
+
+html {
+  background: #090f1f;
+  color-scheme: dark;
 }
 
-#root {
+
+body {
+  margin: 0;
+  min-width: 320px;
   min-height: 100vh;
+
+  background: #090f1f;
+
+  color: #f8fafc;
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+
+::selection {
+
+  background: rgba(246,201,14,.28);
+
+  color:white;
+
+}
+
+
+
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+::-webkit-scrollbar {
+
+  width:10px;
+  height:10px;
+
+}
+
+
+::-webkit-scrollbar-track {
+
+  background:#090f1f;
+
+}
+
+
+::-webkit-scrollbar-thumb {
+
+  background:#34425f;
+
+  border:2px solid #090f1f;
+
+  border-radius:999px;
+
+}
+
+
+
+
+
+@layer components {
+
+
+
+/* =========================
+   CONTAINER
+========================= */
+
+
+.page-container {
+
+  @apply mx-auto w-full max-w-[1500px] px-6 sm:px-8 lg:px-12;
+
+}
+
+
+
+
+
+/* =========================
+   LABEL SUPERIOR
+========================= */
+
+
+.eyebrow {
+
+  @apply inline-flex items-center gap-2 text-[11px] font-black tracking-[.22em] text-brand;
+
+}
+
+
+
+.eyebrow::before {
+
+  content:"";
+
+  @apply h-px w-7 bg-brand;
+
+}
+
+
+
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+
+.cta-button {
+
+  @apply inline-flex min-h-[48px] items-center justify-center gap-3 rounded-xl bg-brand px-6 py-3 text-sm font-black text-void shadow-lg shadow-brand/10 transition hover:-translate-y-0.5 hover:bg-brand-light hover:shadow-brand/20 focus:outline-none focus:ring-2 focus:ring-brand/50;
+
+}
+
+
+
+.secondary-button {
+
+  @apply inline-flex min-h-[48px] items-center justify-center gap-3 rounded-xl border border-white/10 bg-card px-6 py-3 text-sm font-black text-white transition hover:-translate-y-0.5 hover:border-info/50 hover:text-info;
+
+}
+
+
+
+
+
+
+
+/* =========================
+   NAVBAR
+========================= */
+
+
+.nav-link {
+
+  @apply flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-bold text-slate-400 transition hover:bg-white/5 hover:text-white;
+
+}
+
+
+
+.nav-link-active {
+
+  @apply bg-brand text-void hover:bg-brand hover:text-void;
+
+}
+
+
+
+
+
+
+
+/* =========================
+   LOGO
+========================= */
+
+
+.logo-mark {
+
+  @apply relative grid h-10 w-10 place-items-center rounded-xl border border-brand/50 bg-brand/10;
+
+  transform:rotate(45deg);
+
+}
+
+
+
+.logo-mark::before {
+
+  content:"";
+
+  @apply h-4 w-4 rounded-full border-[3px] border-brand;
+
+}
+
+
+
+.logo-mark span {
+
+  @apply absolute h-[3px] w-5 bg-brand;
+
+}
+
+
+
+
+
+
+
+/* =========================
+   AUTH PAGES
+========================= */
+
+
+.auth-shell {
+
+  @apply grid min-h-[calc(100vh-72px)] bg-card lg:grid-cols-2;
+
+}
+
+
+
+.auth-visual {
+
+  @apply relative hidden min-h-[720px] overflow-hidden border-r border-white/10 bg-void lg:flex;
+
+}
+
+
+
+
+
+
+
+
+/* =========================
+   GRID BACKGROUND
+========================= */
+
+
+.grid-pattern {
+
+
+  background-image:
+
+
+    linear-gradient(
+      rgba(51,161,253,.08) 1px,
+      transparent 1px
+    ),
+
+
+    linear-gradient(
+      90deg,
+      rgba(51,161,253,.08) 1px,
+      transparent 1px
+    );
+
+
+
+  background-size:42px 42px;
+
+
+
+  mask-image:
+
+    linear-gradient(
+      to bottom,
+      black,
+      transparent
+    );
+
+}
+
+
+
+
+
+
+
+/* =========================
+   HERO FULL IMAGE
+========================= */
+
+
+.hero-overlay {
+
+  background:
+
+    linear-gradient(
+      90deg,
+      rgba(9,15,31,.95) 0%,
+      rgba(9,15,31,.75) 45%,
+      rgba(9,15,31,.45) 100%
+    );
+
+}
+
+
+
+.hero-image {
+
+  @apply absolute inset-0 h-full w-full object-cover object-center;
+
+}
+
+
+
+
+
+
+.hero-glow {
+
+
+  position:absolute;
+
+
+  right:-15%;
+
+
+  top:-30%;
+
+
+  width:65%;
+
+
+  height:100%;
+
+
+
+  background:
+
+
+    radial-gradient(
+
+      circle,
+
+      rgba(51,161,253,.12),
+
+      transparent 60%
+
+    );
+
+
+}
+
+
+
+
+
+
+
+/* =========================
+   OLD BATTLE COMPONENTS
+========================= */
+
+
+.battle-orbit {
+
+
+  @apply absolute left-1/2 top-[36%] h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full border border-info/20;
+
+
+
+  box-shadow:
+
+
+    0 0 100px rgba(51,161,253,.12),
+
+
+    inset 0 0 70px rgba(139,92,246,.08);
+
+
+}
+
+
+
+
+.battle-orbit::before {
+
+
+  content:"";
+
+
+  @apply absolute inset-8 rounded-full border border-dashed border-special/30;
+
+
+}
+
+
+
+
+
+
+
+.battle-core {
+
+
+  @apply absolute left-1/2 top-1/2 grid h-32 w-32 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-brand/40 bg-card text-brand;
+
+
+
+  box-shadow:
+
+
+    0 0 60px rgba(246,201,14,.18);
+
+
+}
+
+
+
+
+
+.fighter-card {
+
+
+  @apply flex min-h-40 flex-col justify-end rounded-2xl border p-4;
+
+}
+
+
+
+.fighter-blue {
+
+
+  @apply border-info/30 bg-info/10 text-info;
+
+}
+
+
+
+.fighter-purple {
+
+
+  @apply border-special/30 bg-special/10 text-special;
+
+}
+
+
+
+
+
+
+
 }

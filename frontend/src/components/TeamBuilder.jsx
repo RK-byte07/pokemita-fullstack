@@ -1,6 +1,8 @@
 // src/components/TeamBuilder.jsx
 import { useState, useEffect } from 'react';
 import { useBattleStore } from '../store/battleStore';
+import { useAuth } from '../context/AuthContext';
+import { guardarEquipoAPI, listarEquiposAPI, eliminarEquipoAPI } from '../services/equiposService';
 import { iconUrl, TIPOS_COLORES } from '../utils/pokemon';
 import { fetchPokemonList, fetchItems, fetchPokemonDetail } from '../services/battleService';
 import PokemonModal from './PokemonModal';
@@ -15,11 +17,18 @@ export default function TeamBuilder({ onConfirm, onCancel }) {
   const removeFromTeam = useBattleStore((s) => s.removeFromTeam);
   const clearTeam = useBattleStore((s) => s.clearTeam);
 
+  const { isAuthenticated } = useAuth();
+
   const [search, setSearch] = useState('');
   const [tierFilter, setTierFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [editingIndex, setEditingIndex] = useState(-1);
+
+  // Nuevos estados para equipos guardados
+  const [nombreEquipo, setNombreEquipo] = useState('');
+  const [equiposGuardados, setEquiposGuardados] = useState([]);
+  const [mostrarModal, setMostrarModal] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -39,6 +48,15 @@ export default function TeamBuilder({ onConfirm, onCancel }) {
       }
     })();
   }, []);
+
+  // Cargar equipos guardados al iniciar
+  useEffect(() => {
+    if (isAuthenticated) {
+      listarEquiposAPI()
+        .then(setEquiposGuardados)
+        .catch(console.error);
+    }
+  }, [isAuthenticated]);
 
   async function handleAddPokemon(p) {
     if (selectedTeam.find((s) => s.name === p.name)) {
@@ -87,6 +105,42 @@ export default function TeamBuilder({ onConfirm, onCancel }) {
     }
   }
 
+  async function handleGuardarEquipo() {
+    if (!nombreEquipo.trim()) {
+      alert('Ponle un nombre a tu equipo');
+      return;
+    }
+    if (selectedTeam.length !== 6) {
+      alert('Tu equipo debe tener exactamente 6 Pokémon');
+      return;
+    }
+    try {
+      await guardarEquipoAPI(nombreEquipo, selectedTeam);
+      alert('¡Equipo guardado!');
+      setNombreEquipo('');
+      const lista = await listarEquiposAPI();
+      setEquiposGuardados(lista);
+    } catch (e) {
+      alert('Error al guardar: ' + (e.response?.data?.error || e.message));
+    }
+  }
+
+  function handleCargarEquipo(equipo) {
+    clearTeam();
+    equipo.team_data.forEach(p => addToTeam(p));
+    setMostrarModal(false);
+  }
+
+  async function handleEliminarEquipo(id) {
+    try {
+      await eliminarEquipoAPI(id);
+      const lista = await listarEquiposAPI();
+      setEquiposGuardados(lista);
+    } catch (e) {
+      alert('Error al eliminar: ' + (e.response?.data?.error || e.message));
+    }
+  }
+
   let filtered = allPokemon;
   if (search) filtered = filtered.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
   if (tierFilter) filtered = filtered.filter((p) => p.tier === tierFilter);
@@ -109,6 +163,32 @@ export default function TeamBuilder({ onConfirm, onCancel }) {
         >
           🎲 Aleatorio
         </button>
+
+        {/* Botones de Guardar y Cargar */}
+        {isAuthenticated && (
+          <>
+            <button
+              onClick={() => setMostrarModal(true)}
+              className="bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded text-sm font-bold"
+            >
+              📂 Cargar
+            </button>
+            <input
+              type="text"
+              placeholder="Nombre del equipo..."
+              value={nombreEquipo}
+              onChange={(e) => setNombreEquipo(e.target.value)}
+              className="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-sm text-slate-100 w-32"
+            />
+            <button
+              onClick={handleGuardarEquipo}
+              className="bg-green-600 hover:bg-green-500 px-3 py-1.5 rounded text-sm font-bold"
+            >
+              💾 Guardar
+            </button>
+          </>
+        )}
+
         <button
           disabled={selectedTeam.length !== 6}
           onClick={onConfirm}
@@ -199,7 +279,7 @@ export default function TeamBuilder({ onConfirm, onCancel }) {
                 {p.types.map((t) => (
                   <div
                     key={t}
-                    className="w-2 h-2 rounded-full"
+                    className="w-2 h-2 rounded-full"    
                     style={{ background: TIPOS_COLORES[t] || '#666' }}
                   />
                 ))}
@@ -208,6 +288,48 @@ export default function TeamBuilder({ onConfirm, onCancel }) {
           );
         })}
       </div>
+
+      {/* Modal de Equipos Guardados */}
+      {mostrarModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-slate-700 rounded-lg max-w-2xl w-full max-h-[80vh] flex flex-col">
+            <div className="flex justify-between items-center px-5 py-3 border-b border-slate-700">
+              <h3 className="text-lg font-bold text-yellow-400">📂 Mis Equipos</h3>
+              <button onClick={() => setMostrarModal(false)} className="text-slate-400 hover:text-red-400 text-xl">✕</button>
+            </div>
+            <div className="p-4 overflow-y-auto space-y-2">
+              {equiposGuardados.length === 0 ? (
+                <p className="text-slate-500 text-center py-4">No tienes equipos guardados.</p>
+              ) : (
+                equiposGuardados.map((eq) => (
+                  <div key={eq.id} className="flex justify-between items-center bg-slate-900 p-3 rounded border border-slate-700">
+                    <div>
+                      <div className="font-bold text-slate-100">{eq.nombre}</div>
+                      <div className="text-xs text-slate-500">
+                        {eq.team_data.map(p => p.name).join(', ')}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleCargarEquipo(eq)}
+                        className="bg-green-600 hover:bg-green-500 px-3 py-1 rounded text-xs font-bold"
+                      >
+                        Cargar
+                      </button>
+                      <button
+                        onClick={() => handleEliminarEquipo(eq.id)}
+                        className="bg-red-600 hover:bg-red-500 px-3 py-1 rounded text-xs font-bold"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {editingIndex >= 0 && (
         <PokemonModal

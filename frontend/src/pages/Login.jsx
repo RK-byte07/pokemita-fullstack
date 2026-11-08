@@ -1,84 +1,163 @@
 // src/pages/Login.jsx
-import { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Input from '../components/ui/Input';
+import Modal from "../components/ui/Modal";
+import Icon from "../components/ui/Icon";
+import AuthVisual from "../components/AuthVisual";
 
 export default function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(true);
+  const [errors, setErrors] = useState({});
+  const [modal, setModal] = useState(null);
+  const [loading, setLoading] = useState(false);
+  
+  // Estados para el 2FA
+  const [tokenTemporal, setTokenTemporal] = useState(null);
+  const [codigo2FA, setCodigo2FA] = useState("");
 
-  const { dispatch } = useAuth();
+  const { login, verificar2FA } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/';
 
-  function handleSubmit(e) {
+  async function handleSubmit(event) {
+    event.preventDefault();
+    const nextErrors = {};
+    if (!/^\S+@\S+\.\S+$/.test(email)) nextErrors.email = "Ingresa un correo electrónico válido.";
+    if (!password) nextErrors.password = "Ingresa tu contraseña.";
+    
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
+
+    setLoading(true);
+    const result = await login(email, password, remember);
+    setLoading(false);
+
+    if (!result.ok) {
+      setModal({ title: "Error", message: result.reason });
+      return;
+    }
+
+    // Si el backend pide 2FA, guardamos el token temporal y mostramos el input
+    if (result.requiere2FA) {
+      setTokenTemporal(result.tokenTemporal);
+      return;
+    }
+
+    // Si no, redirigimos
+    navigate(location.state?.from?.pathname || "/simulador", { replace: true });
+  }
+
+  async function handleVerificar2FA(e) {
     e.preventDefault();
-    setError('');
+    setLoading(true);
+    
+    // Llamamos al contexto
+    const result = await verificar2FA(tokenTemporal, codigo2FA);
+    
+    setLoading(false);
 
-    if (!username.trim()) return setError('El usuario es obligatorio');
-    if (password.length < 6) return setError('La contraseña debe tener mínimo 6 caracteres');
+    // SI EL RESULTADO NO ES OK, MOSTRAMOS EL ERROR Y NO NAVEGAMOS
+    if (!result.ok) {
+      setModal({ 
+        title: "Código incorrecto", 
+        message: result.reason || "El código ingresado no es válido." 
+      });
+      return; // <--- ESTO ES CLAVE: Detiene la ejecución y no te deja pasar
+    }
 
-    dispatch({ type: 'LOGIN', payload: { username } });
-    navigate(from, { replace: true });
+    // Solo si es OK, navegamos al simulador
+    navigate(location.state?.from?.pathname || "/simulador", { replace: true });
   }
 
   return (
-    <div className="max-w-md mx-auto mt-16 px-4">
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 shadow-lg">
-        <h2 className="text-3xl font-bold text-yellow-400 mb-6 text-center">
-          Iniciar sesión
-        </h2>
+    <div className="auth-shell">
+      <AuthVisual />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
-              Usuario
-            </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-yellow-400"
-              placeholder="ash_ketchum"
-            />
-          </div>
+      <section className="flex items-center justify-center p-6 sm:p-10 lg:p-16">
+        <div className="w-full max-w-md">
+          
+          {tokenTemporal ? (
+            // FORMULARIO 2FA
+            <form onSubmit={handleVerificar2FA} className="space-y-5">
+              <div className="mb-8">
+                <span className="eyebrow">SEGURIDAD EXTRA</span>
+                <h1 className="mt-3 text-4xl font-black tracking-tight text-white">Verificación 2FA</h1>
+                <p className="mt-2 text-slate-400">Ingresa el código de 6 dígitos de tu app autenticadora.</p>
+              </div>
+              
+              <Input
+                label="Código de 6 dígitos"
+                type="text"
+                placeholder="123456"
+                value={codigo2FA}
+                onChange={(e) => setCodigo2FA(e.target.value)}
+                maxLength={6}
+              />
 
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-1">
-              Contraseña
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-yellow-400"
-              placeholder="••••••"
-            />
-          </div>
+              <button disabled={loading} className="cta-button w-full">
+                {loading ? "Verificando…" : "Verificar código"}
+                <Icon name="arrow" />
+              </button>
+            </form>
+          ) : (
+            // LOGIN NORMAL
+            <>
+              <div className="mb-8">
+                <span className="eyebrow">ACCESO DE ENTRENADOR</span>
+                <h1 className="mt-3 text-4xl font-black tracking-tight text-white">Vuelve a la arena</h1>
+                <p className="mt-2 text-slate-400">Inicia sesión para gestionar tu equipo competitivo.</p>
+              </div>
 
-          {error && (
-            <div className="bg-red-500/20 border border-red-500 text-red-300 text-sm px-3 py-2 rounded-lg">
-              {error}
-            </div>
+              <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+                <Input
+                  label="Correo electrónico"
+                  icon="mail"
+                  type="email"
+                  placeholder="usuario@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  error={errors.email}
+                />
+
+                <Input
+                  label="Contraseña"
+                  icon="lock"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  error={errors.password}
+                />
+
+                <div className="flex items-center justify-between gap-4 text-sm">
+                  <label className="flex cursor-pointer items-center gap-2 text-slate-300">
+                    <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4 accent-brand" />
+                    Recordarme
+                  </label>
+                </div>
+
+                <button disabled={loading} className="cta-button w-full">
+                  {loading ? "Verificando…" : "Iniciar batalla"}
+                  <Icon name="arrow" />
+                </button>
+              </form>
+
+              <p className="mt-7 text-center text-sm text-slate-400">
+                ¿Aún no tienes perfil?{" "}
+                <Link to="/register" className="font-black text-brand hover:text-brand-light">
+                  Crea tu cuenta
+                </Link>
+              </p>
+            </>
           )}
+        </div>
+      </section>
 
-          <button
-            type="submit"
-            className="w-full bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-bold py-2 rounded-lg transition"
-          >
-            Entrar
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-slate-400 text-sm">
-          ¿No tienes cuenta?{' '}
-          <Link to="/register" className="text-yellow-400 hover:underline">
-            Regístrate
-          </Link>
-        </p>
-      </div>
+      <Modal open={!!modal} {...modal} onClose={() => setModal(null)} />
     </div>
   );
 }

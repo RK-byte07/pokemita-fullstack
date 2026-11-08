@@ -1,4 +1,4 @@
-// src/services/api.js
+// frontend/src/services/api.js
 import axios from 'axios';
 
 const api = axios.create({
@@ -6,6 +6,20 @@ const api = axios.create({
   timeout: 15000,
 });
 
+// Interceptor de peticiones: añade el token JWT si existe
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('pokemita_token') || sessionStorage.getItem('pokemita_token');
+    
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Interceptor de respuestas: manejo de errores
 api.interceptors.response.use(
   (response) => response,
   (error) => {
