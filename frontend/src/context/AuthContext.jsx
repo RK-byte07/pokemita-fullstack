@@ -1,243 +1,126 @@
 // frontend/src/context/AuthContext.jsx
 
 import { createContext, useContext, useEffect, useReducer } from "react";
+import { apiLogin, apiRegister, apiVerificar2FA } from "../services/authService";
 
 const AuthContext = createContext(null);
 
+const TOKEN_KEY = "pokemita_token";
 const USER_KEY = "pokemita_user";
-const SESSION_USER_KEY = "pokemita_session_user";
-const ACCOUNTS_KEY = "pokemita_accounts";
 
 const initialState = {
   user: null,
-
+  token: null,
   isAuthenticated: false,
-
   remember: false,
 };
-
-function readJSON(key, fallback) {
-  try {
-    return JSON.parse(localStorage.getItem(key)) ?? fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-async function hashPassword(password) {
-  const encoder = new TextEncoder();
-
-  const data = encoder.encode(password);
-
-  const hash = await crypto.subtle.digest("SHA-256", data);
-
-  return Array.from(new Uint8Array(hash))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
 
 function authReducer(state, action) {
   switch (action.type) {
     case "LOGIN":
       return {
         user: action.payload.user,
-
+        token: action.payload.token,
         isAuthenticated: true,
-
         remember: action.payload.remember,
       };
-
     case "LOGOUT":
       return initialState;
-
     default:
       return state;
   }
 }
 
 export function AuthProvider({ children }) {
-  const [state, dispatch] = useReducer(
-    authReducer,
-
-    initialState,
-
-    () => {
-      const savedUser = readJSON(USER_KEY, null);
-
-      const sessionUser = JSON.parse(sessionStorage.getItem(SESSION_USER_KEY));
-
-      if (savedUser) {
-        return {
-          user: savedUser,
-
-          isAuthenticated: true,
-
-          remember: true,
-        };
-      }
-
-      if (sessionUser) {
-        return {
-          user: sessionUser,
-
-          isAuthenticated: true,
-
-          remember: false,
-        };
-      }
-
-      return initialState;
-    },
-  );
+  const [state, dispatch] = useReducer(authReducer, initialState, () => {
+    // Al recargar, recuperamos el usuario y el token
+    const savedUser = localStorage.getItem(USER_KEY) || sessionStorage.getItem(USER_KEY);
+    const savedToken = localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+    
+    if (savedUser && savedToken) {
+      return {
+        user: JSON.parse(savedUser),
+        token: savedToken,
+        isAuthenticated: true,
+        remember: !!localStorage.getItem(TOKEN_KEY),
+      };
+    }
+    return initialState;
+  });
 
   useEffect(() => {
+    // Limpiamos ambos almacenamientos antes de guardar
+    localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(USER_KEY);
 
-    sessionStorage.removeItem(SESSION_USER_KEY);
-
-    if (state.user && state.remember) {
-      localStorage.setItem(
-        USER_KEY,
-
-        JSON.stringify(state.user),
-      );
+    if (state.user && state.token) {
+      const storage = state.remember ? localStorage : sessionStorage;
+      storage.setItem(TOKEN_KEY, state.token);
+      storage.setItem(USER_KEY, JSON.stringify(state.user));
     }
+  }, [state.user, state.token, state.remember]);
 
-    if (state.user && !state.remember) {
-      sessionStorage.setItem(
-        SESSION_USER_KEY,
-
-        JSON.stringify(state.user),
-      );
+  async function register({ username, email, phone, password }) {
+    try {
+      const data = await apiRegister({ username, email, phone, password });
+      dispatch({
+        type: "LOGIN",
+        payload: { user: data.user, token: data.token, remember: true },
+      });
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, reason: error.response?.data?.error || "Error de conexión" };
     }
-  }, [state.user, state.remember]);
-
-  async function register({
-    username,
-
-    email,
-
-    phone,
-
-    password,
-  }) {
-    const accounts = readJSON(ACCOUNTS_KEY, []);
-
-    const cleanEmail = email.trim().toLowerCase();
-
-    const exists = accounts.some((account) => account.email === cleanEmail);
-
-    if (exists) {
-      return {
-        ok: false,
-
-        reason: "exists",
-      };
-    }
-
-    const account = {
-      username: username.trim(),
-
-      email: cleanEmail,
-
-      phone: phone.trim(),
-
-      passwordHash: await hashPassword(password),
-    };
-
-    localStorage.setItem(
-      ACCOUNTS_KEY,
-
-      JSON.stringify([...accounts, account]),
-    );
-
-    const user = {
-      username: account.username,
-
-      email: account.email,
-
-      phone: account.phone,
-    };
-
-    dispatch({
-      type: "LOGIN",
-
-      payload: {
-        user,
-
-        remember: true,
-      },
-    });
-
-    return {
-      ok: true,
-    };
   }
 
-  async function login(
-    email,
+  async function login(email, password, remember = true) {
+    try {
+      const data = await apiLogin(email, password);
 
-    password,
+      // Si el backend pide 2FA, NO guardamos el token final todavía
+      if (data.requiere2FA) {
+        return { 
+          ok: true, 
+          requiere2FA: true, 
+          tokenTemporal: data.tokenTemporal 
+        };
+      }
 
-    remember = true,
-  ) {
-    const accounts = readJSON(ACCOUNTS_KEY, []);
-
-    const account = accounts.find(
-      (item) => item.email === email.trim().toLowerCase(),
-    );
-
-    if (!account) {
-      return {
-        ok: false,
-
-        reason: "email",
-      };
+      // Si no pide 2FA, guardamos todo normal
+      dispatch({
+        type: "LOGIN",
+        payload: { user: data.user, token: data.token, remember },
+      });
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, reason: error.response?.data?.error || "Error de conexión" };
     }
+  }
 
-    const passwordHash = await hashPassword(password);
-
-    if (account.passwordHash !== passwordHash) {
-      return {
-        ok: false,
-
-        reason: "password",
-      };
+  async function verificar2FA(tokenTemporal, codigo) {
+    try {
+      const data = await apiVerificar2FA(tokenTemporal, codigo);
+      // Aquí ya nos dan el token final y el usuario
+      dispatch({
+        type: "LOGIN",
+        payload: { user: data.user, token: data.token, remember: true },
+      });
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, reason: error.response?.data?.error || "Código incorrecto" };
     }
-
-    const user = {
-      username: account.username,
-
-      email: account.email,
-
-      phone: account.phone,
-    };
-
-    dispatch({
-      type: "LOGIN",
-
-      payload: {
-        user,
-
-        remember,
-      },
-    });
-
-    return {
-      ok: true,
-    };
   }
 
   return (
     <AuthContext.Provider
       value={{
         ...state,
-
         dispatch,
-
         login,
-
         register,
+        verificar2FA,
       }}
     >
       {children}
@@ -247,10 +130,8 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-
   if (!context) {
     throw new Error("useAuth debe usarse dentro de AuthProvider");
   }
-
   return context;
 }
