@@ -1,4 +1,3 @@
-// src/pages/Wiki.jsx
 import { useState } from 'react';
 
 const SECCIONES = [

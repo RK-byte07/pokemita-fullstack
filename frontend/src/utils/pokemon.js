@@ -1,4 +1,3 @@
-// src/utils/pokemon.js
 export const TIPOS_COLORES = {
   Normal: '#a8a878', Fire: '#f08030', Water: '#6890f0', Electric: '#f8d030',
   Grass: '#78c850', Ice: '#98d8d8', Fighting: '#c03028', Poison: '#a040a0',

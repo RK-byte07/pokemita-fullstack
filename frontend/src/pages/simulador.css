@@ -1,0 +1,1838 @@
+.sim {
+  padding-top: 34px;
+  padding-bottom: 48px;
+}
+
+.sim button,
+.sim-dialog button {
+  cursor: pointer;
+}
+
+.sim button:disabled,
+.sim-dialog button:disabled {
+  cursor: not-allowed;
+  opacity: .4;
+}
+
+.sim :focus-visible,
+.sim-dialog :focus-visible {
+  outline: 2px solid #f6c90e;
+  outline-offset: 3px;
+}
+
+.sim h1 {
+  font-size: clamp(26px, 3vw, 40px);
+  font-weight: 900;
+  letter-spacing: -.04em;
+  margin-top: 8px;
+}
+
+.sim h2,
+.sim-dialog h2 {
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: -.035em;
+}
+
+.sim h3,
+.sim-dialog h3 {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.sim h4 {
+  font-size: 13px;
+  font-weight: 800;
+  margin: 18px 0 12px;
+}
+
+.sim-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.sim-page-heading {
+  margin-bottom: 26px;
+}
+
+.sim-kicker {
+  display: block;
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+
+.sim-gold {
+  color: #f6c90e;
+}
+
+.sim-error-text {
+  color: #f87171;
+}
+
+.sim-muted {
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 10px 0;
+}
+
+.sim-panel {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid #ffffff14;
+  border-radius: 18px;
+  background: #151f35;
+  margin-bottom: 20px;
+}
+
+.sim-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.sim-primary,
+.sim-secondary {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  transition: transform .2s, background .2s;
+}
+
+.sim-primary {
+  background: #f6c90e;
+  color: #090f1f;
+}
+
+.sim-primary:hover {
+  background: #ffe16a;
+}
+
+.sim-secondary {
+  border: 1px solid #ffffff18;
+  background: #202c45;
+  color: #e2e8f0;
+}
+
+.sim-secondary:hover {
+  border-color: #33a1fd;
+}
+
+.sim-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #ffffff20;
+  border-radius: 9px;
+  color: #cbd5e1;
+}
+
+.sim-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.sim-notice {
+  white-space: pre-line;
+  padding: 16px;
+  margin: 16px 0;
+  border: 1px solid #f6c90e44;
+  background: #f6c90e0a;
+  border-radius: 12px;
+  color: #e2e8f0;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.sim-notice button {
+  color: #f6c90e;
+  text-decoration: underline;
+  margin-left: 10px;
+}
+
+.sim input:not([type=checkbox]):not([type=range]),
+.sim select,
+.sim-dialog input:not([type=checkbox]),
+.sim-dialog select {
+  min-width: 0;
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 1px solid #ffffff20;
+  border-radius: 9px;
+  background: #090f1f;
+  color: #e2e8f0;
+  font-size: 12px;
+}
+
+.sim input[type=range],
+.sim input[type=checkbox] {
+  accent-color: #f6c90e;
+}
+
+.sim-label {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  color: #cbd5e1;
+  font-size: 12px;
+}
+
+.sim-label input[type=range] {
+  width: 100%;
+  margin: 16px 0;
+}
+
+/* Menú */
+
+.sim-menu-hero {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 38px;
+  border: 1px solid #ffffff12;
+  border-radius: 22px;
+  margin-bottom: 22px;
+  background:
+    radial-gradient(
+      circle at 85% 20%,
+      #33a1fd20,
+      transparent 60%
+    ),
+    #151f35;
+}
+
+.sim-menu-hero h2 {
+  font-size: clamp(36px, 5vw, 64px);
+  line-height: 1.05;
+  margin: 18px 0;
+}
+
+.sim-menu-hero em {
+  font-style: normal;
+  color: #f6c90e;
+}
+
+.sim-menu-hero p {
+  max-width: 580px;
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.sim-pokeball {
+  color: #33a1fd33;
+  font-size: 230px;
+  line-height: 1;
+  transform: rotate(-25deg);
+}
+
+.sim-rule-options {
+  display: grid;
+  gap: 10px;
+}
+
+.sim-rule-options button {
+  padding: 14px;
+  text-align: left;
+  border: 1px solid #ffffff18;
+  background: #090f1f66;
+  border-radius: 10px;
+}
+
+.sim-rule-options button[aria-pressed=true] {
+  border-color: #f6c90e;
+  background: #f6c90e09;
+}
+
+.sim-rule-options b,
+.sim-rule-options span {
+  display: block;
+}
+
+.sim-rule-options b {
+  font-size: 13px;
+}
+
+.sim-rule-options span {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.sim-rule-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.sim-rule-tags span {
+  padding: 7px 9px;
+  border: 1px solid #33a1fd30;
+  color: #93c5fd;
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.sim-mode-cards > button {
+  padding: 30px;
+  text-align: left;
+  border: 1px solid #ffffff20;
+  border-radius: 20px;
+  background: #151f35;
+  transition:
+    border-color .2s,
+    box-shadow .2s,
+    transform .2s;
+}
+
+.sim-mode-cards > button:hover {
+  border-color: #f6c90e;
+  box-shadow: 0 0 30px #f6c90e12;
+  transform: translateY(-3px);
+}
+
+.sim-mode-cards h2 {
+  margin: 12px 0;
+}
+
+.sim-mode-cards p {
+  color: #94a3b8;
+  font-size: 13px;
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+.sim-mode-cards b {
+  color: #f6c90e;
+  font-size: 12px;
+}
+
+.sim-mode-icon {
+  display: block;
+  font-size: 32px;
+  color: #33a1fd;
+  margin-bottom: 16px;
+}
+
+/* Constructor de equipos */
+
+.sim-team-slots {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.sim-team-slot {
+  position: relative;
+  border: 1px solid #ffffff18;
+  border-radius: 13px;
+  background: #090f1f88;
+  overflow: hidden;
+}
+
+.sim-team-edit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 190px;
+  padding: 13px;
+  text-align: center;
+}
+
+.sim-team-edit:hover {
+  background: #33a1fd12;
+}
+
+.sim-team-edit img,
+.sim-team-edit .pdx-image-fallback {
+  height: 90px;
+  width: 90px;
+}
+
+.sim-team-edit b {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.sim-team-edit small {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.sim-team-edit > span:last-child {
+  font-size: 10px;
+  color: #f6c90e;
+}
+
+.sim-remove {
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  width: 29px;
+  height: 29px;
+  color: #f87171;
+  border-radius: 7px;
+  background: #151f35;
+  font-size: 12px;
+}
+
+.sim-empty-slot {
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  min-height: 190px;
+  text-align: center;
+  color: #475569;
+}
+
+.sim-empty-slot span {
+  font-size: 34px;
+}
+
+.sim-empty-slot small {
+  font-size: 11px;
+}
+
+.sim-save-row {
+  display: flex;
+  gap: 10px;
+}
+
+.sim-save-row input {
+  flex: 1;
+}
+
+.sim-saved-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid #ffffff10;
+}
+
+.sim-saved-row > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.sim-saved-row b {
+  font-size: 13px;
+}
+
+.sim-saved-row p {
+  color: #94a3b8;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.sim-filters {
+  display: flex;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.sim-filters input {
+  flex: 1;
+}
+
+.sim-catalog {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.sim-catalog > button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 16px 10px;
+  border: 1px solid #ffffff15;
+  border-radius: 14px;
+  background:
+    radial-gradient(
+      circle at 50% 30%,
+      #33a1fd12,
+      #090f1f 80%
+    );
+  transition:
+    border-color .2s,
+    box-shadow .2s;
+}
+
+.sim-catalog > button:hover {
+  border-color: #f6c90e;
+  box-shadow: 0 0 25px #33a1fd22;
+}
+
+.sim-catalog img,
+.sim-catalog .pdx-image-fallback {
+  width: 90px;
+  height: 90px;
+}
+
+.sim-catalog b {
+  font-size: 12px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.sim-catalog small {
+  color: #94a3b8;
+  font-size: 9px;
+  text-align: center;
+}
+
+.sim-catalog .sim-gold {
+  font-size: 10px;
+  margin-top: auto;
+}
+
+.sim-type-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.sim-more {
+  display: flex;
+  margin: 22px auto 0;
+}
+
+/* Editor del Pokémon */
+
+.sim-dialog {
+  width: min(1060px, calc(100% - 24px));
+  max-height: calc(100dvh - 30px);
+  padding: 0;
+  border: 1px solid #33a1fd55;
+  border-radius: 20px;
+  color: #f8fafc;
+  background: #090f1f;
+}
+
+.sim-dialog::backdrop {
+  background: #020617dc;
+  backdrop-filter: blur(7px);
+}
+
+.sim-dialog-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: #151f35;
+  border-bottom: 1px solid #ffffff12;
+}
+
+.sim-dialog-body {
+  padding: 24px;
+}
+
+.sim-dialog-body > h2 {
+  font-size: clamp(28px, 4vw, 42px);
+  margin-bottom: 18px;
+}
+
+.sim-editor-hero {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.sim-editor-hero p {
+  font-size: 12px;
+}
+
+.sim-editor-art {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 170px;
+  height: 170px;
+  border: 1px solid #ffffff12;
+  border-radius: 20px;
+  background:
+    radial-gradient(
+      circle,
+      #33a1fd22,
+      #151f35 70%
+    );
+}
+
+.sim-editor-art img,
+.sim-editor-art .pdx-image-fallback {
+  width: 160px;
+  height: 160px;
+}
+
+.sim-ability-list {
+  display: grid;
+  gap: 9px;
+}
+
+.sim-ability-list button {
+  padding: 12px;
+  border: 1px solid #ffffff20;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.sim-ability-list button[aria-pressed=true] {
+  border-color: #f6c90e;
+  background: #f6c90e09;
+}
+
+.sim-ability-list b {
+  display: block;
+  font-size: 12px;
+}
+
+.sim-ability-list span {
+  display: block;
+  margin-top: 6px;
+  color: #94a3b8;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.sim-table-wrap {
+  overflow-x: auto;
+}
+
+.sim-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+
+.sim-table th {
+  color: #94a3b8;
+  font-size: 10px;
+  padding: 12px;
+}
+
+.sim-table td {
+  padding: 10px 12px;
+  border-top: 1px solid #ffffff10;
+}
+
+.sim-table input {
+  width: 80px;
+}
+
+.sim-selected-moves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.sim-selected-moves button {
+  padding: 7px 10px;
+  border-radius: 6px;
+  color: #f6c90e;
+  background: #f6c90e12;
+  font-size: 11px;
+}
+
+.sim-move-picker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.sim-move-picker > button {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ffffff15;
+  border-radius: 10px;
+  background: #090f1f;
+}
+
+.sim-move-picker > button[aria-pressed=true] {
+  border-color: #33a1fd;
+  background: #33a1fd0c;
+}
+
+.sim-move-picker > button > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sim-move-picker b {
+  font-size: 12px;
+}
+
+.sim-move-picker small,
+.sim-move-picker > button > span {
+  display: block;
+  margin-top: 7px;
+  color: #94a3b8;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+/* Cabecera de batalla */
+
+.sim-battle-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.sim-chip {
+  padding: 8px 10px;
+  border: 1px solid #ffffff18;
+  background: #151f35;
+  border-radius: 7px;
+  font-size: 10px;
+  color: #cbd5e1;
+}
+
+.sim-battle-top label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+/* Campo y registro */
+
+.sim-field-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 18px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+
+.sim-field-column {
+  min-width: 0;
+}
+
+.sim-arena {
+  --scene-height: 500px;
+  position: relative;
+  isolation: isolate;
+  height: var(--scene-height);
+  overflow: hidden;
+  border: 5px solid #35465b;
+  border-radius: 12px;
+  background: #b9dcad;
+  box-shadow:
+    inset 0 0 0 3px #f1f4cd,
+    0 10px 28px #0003;
+}
+
+.sim-arena::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: .07;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      #213749 0 1px,
+      transparent 1px 4px
+    );
+}
+
+.sim-arena-sky {
+  position: absolute;
+  inset: 0 0 57%;
+  background:
+    linear-gradient(
+      #9ecbd8 0%,
+      #d6ebdc 76%,
+      #eff2cf 100%
+    );
+}
+
+.sim-arena-sky::before,
+.sim-arena-sky::after {
+  content: '';
+  position: absolute;
+  width: 130px;
+  height: 16px;
+  background: #f7f8df99;
+  box-shadow:
+    16px -12px 0 #f7f8df99,
+    50px -6px 0 #f7f8df99,
+    -12px 8px 0 #f7f8df99;
+}
+
+.sim-arena-sky::before {
+  left: 18%;
+  top: 30%;
+}
+
+.sim-arena-sky::after {
+  right: 12%;
+  top: 48%;
+  transform: scale(.75);
+}
+
+.sim-arena-floor {
+  position: absolute;
+  inset: 41% 0 0;
+  border-top: 5px solid #779b72;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      #c2dca3 0 34px,
+      #b7d69a 34px 68px
+    );
+}
+
+.sim-arena-floor::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: .18;
+  background-image:
+    linear-gradient(
+      90deg,
+      #71976344 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      #71976344 1px,
+      transparent 1px
+    );
+  background-size: 34px 34px;
+}
+
+.sim-arena-title {
+  position: absolute;
+  z-index: 3;
+  top: 16px;
+  left: 18px;
+  color: #2c4850;
+  font: 800 10px ui-monospace, monospace;
+  letter-spacing: .16em;
+}
+
+.sim-arena-title span {
+  display: block;
+  margin-top: 5px;
+  color: #4d6c68;
+  font-size: 9px;
+  letter-spacing: .08em;
+}
+
+.sim-arena-caption {
+  position: absolute;
+  z-index: 3;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 16px;
+  background: #243f42;
+  color: #f7f5d3;
+  border-top: 3px solid #71987f;
+  font: 700 10px ui-monospace, monospace;
+  letter-spacing: .06em;
+}
+
+/* Posición de Pokémon y plataformas */
+
+.sim-fighter {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.sim-ground-anchor {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.sim-fighter-p1 .sim-ground-anchor {
+  left: 25%;
+  top: 79%;
+  --sprite-size: 180px;
+  --platform-width: 220px;
+}
+
+.sim-fighter-p2 .sim-ground-anchor {
+  left: 75%;
+  top: 47%;
+  --sprite-size: 152px;
+  --platform-width: 190px;
+}
+
+.sim-platform {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  top: 0;
+  width: var(--platform-width);
+  height: 52px;
+  transform: translate(-50%, -50%);
+  border: 3px solid #638654;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      ellipse,
+      #dbe4ac 0 48%,
+      #a6bd7a 49% 68%,
+      #77975b 69%
+    );
+  box-shadow:
+    0 5px 0 #4c744c33,
+    inset 0 -7px 0 #658b5b33;
+}
+
+.sim-fighter-p2 .sim-platform {
+  height: 42px;
+}
+
+.sim-fighter-sprite {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  bottom: -12px;
+  width: var(--sprite-size);
+  height: var(--sprite-size);
+  transform: translateX(-50%);
+}
+
+.sim-sprite-motion {
+  display: grid;
+  place-items: end center;
+  width: 100%;
+  height: 100%;
+}
+
+.sim-fighter-sprite img,
+.sim-fighter-sprite .pdx-image-fallback {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 7px 3px #304a4530);
+}
+
+/* Tarjetas de información del Pokémon */
+
+.sim-health-card {
+  position: absolute;
+  z-index: 3;
+  width: min(290px, 45%);
+  padding: 14px 16px;
+  border: 3px solid #34464b;
+  border-radius: 7px 7px 20px 7px;
+  background: #faf7d9;
+  color: #283b3d;
+  box-shadow:
+    4px 4px 0 #35514c30,
+    inset 0 0 0 2px #fffceb;
+}
+
+.sim-fighter-p2 .sim-health-card {
+  top: 16%;
+  left: 4%;
+}
+
+.sim-fighter-p1 .sim-health-card {
+  bottom: 12%;
+  right: 4%;
+}
+
+.sim-health-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.sim-health-card .sim-health-name {
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.sim-health-heading > span {
+  padding-top: 3px;
+  white-space: nowrap;
+  color: #47615a;
+  font: 700 11px ui-monospace, monospace;
+}
+
+.sim-health-card .sim-type-list {
+  gap: 6px;
+}
+
+.sim-health-card .sim-health-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 27px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: #213738;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0;
+  white-space: nowrap;
+  background:
+    color-mix(
+      in srgb,
+      var(--type-color) 30%,
+      #faf7d9
+    );
+  border-color:
+    color-mix(
+      in srgb,
+      var(--type-color) 75%,
+      #34464b
+    );
+}
+
+.sim-type-emoji {
+  flex-shrink: 0;
+  font-family:
+    'Apple Color Emoji',
+    'Segoe UI Emoji',
+    sans-serif;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.sim-hp {
+  margin: 10px 0 7px;
+  height: 14px;
+  background: #34464b;
+  border: 2px solid #34464b;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.sim-hp > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  transition: width .4s;
+  box-shadow: inset 0 2px 0 #ffffff55;
+}
+
+.sim-health-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px 8px;
+}
+
+.sim-health-meta > small {
+  color: #47615a;
+  font: 700 12px ui-monospace, monospace;
+  line-height: 1.4;
+}
+
+.sim-status {
+  display: inline-block;
+  margin: 0;
+  padding: 3px 5px;
+  border-radius: 3px;
+  background: #76578c;
+  color: #fff8e6;
+  font: 700 10px ui-monospace, monospace;
+}
+
+.sim-tera-badge {
+  display: block;
+  margin-top: 6px;
+  color: #006b7c;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.sim-boosts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.sim-boosts span {
+  padding: 2px 4px;
+  margin-top: 4px;
+  font-size: 9px;
+  color: #244e38;
+  background: #93bb8733;
+  border: 1px solid #63865444;
+}
+
+.sim-fainted {
+  opacity: .35;
+  filter: grayscale(1);
+}
+
+.sim-attacking.sim-fighter-p1 .sim-sprite-motion {
+  animation: sim-lunge-player .4s ease-in-out;
+}
+
+.sim-attacking.sim-fighter-p2 .sim-sprite-motion {
+  animation: sim-lunge-opponent .4s ease-in-out;
+}
+
+/* Registro de batalla */
+
+.sim-combat-journal {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 500px;
+  max-height: 500px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-color: #33a1fd33;
+}
+
+.sim-combat-journal > .sim-heading {
+  padding: 18px 16px;
+  border-bottom: 1px solid #ffffff14;
+  background: #202c4566;
+}
+
+.sim-combat-journal h3 {
+  margin: 5px 0 0;
+  font-size: 15px;
+}
+
+.sim-combat-journal .sim-kicker {
+  font-size: 8px;
+}
+
+.sim-journal-indicator {
+  flex-shrink: 0;
+  padding: 5px 7px;
+  border: 1px solid #22c55e44;
+  border-radius: 5px;
+  color: #86efac;
+  background: #22c55e0d;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.sim-journal-indicator.is-busy {
+  color: #f6c90e;
+  border-color: #f6c90e44;
+  background: #f6c90e0d;
+}
+
+.sim-battle-log {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 14px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.8;
+  color: #cbd5e1;
+  background: #090f1f44;
+}
+
+.sim-battle-log > p {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 9px;
+  padding: 9px 0;
+  border-bottom: 1px solid #ffffff08;
+  overflow-wrap: anywhere;
+}
+
+.sim-log-number {
+  padding-top: 2px;
+  color: #52637e;
+  font-size: 8px;
+  user-select: none;
+}
+
+.sim-battle-log > .sim-log-turn {
+  color: #f6c90e;
+  font-weight: 800;
+}
+
+.sim-battle-log > .sim-log-important {
+  color: #93c5fd;
+  font-weight: 700;
+}
+
+.sim-log-empty {
+  padding: 42px 5px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.sim-log-empty > span {
+  display: block;
+  margin-bottom: 15px;
+  color: #33a1fd;
+  font-size: 28px;
+}
+
+.sim-log-empty p {
+  font-size: 12px;
+}
+
+.sim-log-empty small {
+  display: block;
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 10px;
+}
+
+.sim-journal-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 11px 15px;
+  border-top: 1px solid #ffffff12;
+  color: #94a3b8;
+  font-size: 9px;
+}
+
+/* Controles inferiores */
+
+.sim-command-row {
+  width: 100%;
+  min-width: 0;
+}
+
+.sim-command-row > .sim-panel {
+  width: 100%;
+}
+
+.sim-controls {
+  border: 1px solid #f6c90e44;
+  background:
+    linear-gradient(
+      135deg,
+      #19263e,
+      #111b2e
+    );
+  box-shadow: 0 10px 30px #0002;
+}
+
+.sim-tabs {
+  display: flex;
+  gap: 10px;
+  margin: 18px 0;
+  padding: 5px;
+  border: 1px solid #ffffff0d;
+  border-radius: 12px;
+  background: #090f1f88;
+}
+
+.sim-tabs button {
+  flex: 1;
+  min-height: 42px;
+  padding: 10px;
+  border: 0;
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 800;
+  transition:
+    background .15s,
+    color .15s;
+}
+
+.sim-tabs button:hover {
+  background: #ffffff08;
+  color: #fff;
+}
+
+.sim-tabs button[aria-pressed=true] {
+  background: #f6c90e;
+  color: #090f1f;
+  box-shadow: 0 3px 12px #f6c90e15;
+}
+
+.sim-battle-moves {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.sim-battle-moves > button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 132px;
+  padding: 18px;
+  text-align: left;
+  border: 1px solid #33a1fd44;
+  border-bottom-width: 4px;
+  border-radius: 12px;
+  background:
+    linear-gradient(
+      135deg,
+      #24334e,
+      #151f35
+    );
+  transition:
+    transform .15s,
+    border-color .15s,
+    box-shadow .15s;
+}
+
+.sim-battle-moves > button:not(:disabled):hover {
+  transform: translateY(-3px);
+  border-color: #f6c90e;
+  box-shadow: 0 6px 20px #33a1fd12;
+}
+
+.sim-battle-moves b {
+  color: #f8fafc;
+  font-size: 15px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.sim-battle-moves .pdx-type {
+  width: fit-content;
+}
+
+.sim-battle-moves small {
+  margin-top: auto;
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.sim-checkbox {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  margin-top: 18px;
+  color: #67e8f9;
+  font-size: 11px;
+}
+
+.sim-party {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.sim-party button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  padding: 14px 8px;
+  border: 1px solid #ffffff20;
+  border-bottom-width: 3px;
+  border-radius: 12px;
+  background: #090f1f77;
+  transition:
+    border-color .15s,
+    background .15s;
+}
+
+.sim-party button:not(:disabled):hover,
+.sim-party button[aria-pressed=true] {
+  border-color: #f6c90e;
+  background: #f6c90e08;
+}
+
+.sim-party img,
+.sim-party .pdx-image-fallback {
+  width: 66px;
+  height: 66px;
+}
+
+.sim-party b {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.sim-party small {
+  color: #94a3b8;
+  font-size: 9px;
+}
+
+.sim-bag {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.sim-bag button {
+  min-height: 88px;
+  text-align: left;
+  padding: 14px 12px;
+  border: 1px solid #ffffff18;
+  border-bottom-width: 3px;
+  border-radius: 10px;
+  background: #090f1f;
+  transition:
+    border-color .15s,
+    background .15s;
+}
+
+.sim-bag button:not(:disabled):hover {
+  border-color: #33a1fd;
+}
+
+.sim-bag button[aria-pressed=true] {
+  border-color: #f6c90e;
+  background: #f6c90e0a;
+}
+
+.sim-bag b {
+  display: block;
+  color: #e2e8f0;
+  font-size: 12px;
+}
+
+.sim-bag small {
+  display: block;
+  margin-top: 9px;
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+/* Efectos del campo y equipo rival */
+
+.sim-field {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 0;
+}
+
+.sim-field span {
+  color: #cbd5e1;
+  background: #151f35;
+  border: 1px solid #ffffff12;
+  padding: 6px 9px;
+  border-radius: 6px;
+  font-size: 10px;
+}
+
+.sim-opponent-preview {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+  border: 1px solid #ffffff12;
+  border-radius: 12px;
+  background: #151f35;
+}
+
+.sim-opponent-preview > b {
+  color: #94a3b8;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.sim-opponent-preview > span {
+  display: grid;
+  justify-items: center;
+  min-width: 65px;
+}
+
+.sim-opponent-preview img,
+.sim-opponent-preview .pdx-image-fallback {
+  width: 40px;
+  height: 40px;
+}
+
+.sim-opponent-preview small {
+  font-size: 9px;
+  white-space: nowrap;
+  color: #94a3b8;
+}
+
+/* Resultado */
+
+.sim-result {
+  padding: 30px;
+  margin-bottom: 20px;
+  text-align: center;
+  background:
+    linear-gradient(
+      135deg,
+      #f6c90e12,
+      #151f35
+    );
+  border: 1px solid #f6c90e55;
+  border-radius: 18px;
+}
+
+.sim-result > span {
+  font-size: 40px;
+  color: #f6c90e;
+}
+
+.sim-result p {
+  color: #94a3b8;
+  font-size: 12px;
+  margin: 10px 0 20px;
+}
+
+.sim-wait {
+  padding: 30px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+/* Animaciones */
+
+@keyframes sim-lunge-player {
+  50% {
+    transform: translate(18px, -10px);
+  }
+}
+
+@keyframes sim-lunge-opponent {
+  50% {
+    transform: translate(-18px, 10px);
+  }
+}
+
+/* Adaptación a pantallas */
+
+@media (max-width: 1200px) {
+  .sim-field-layout {
+    grid-template-columns: minmax(0, 1fr) 285px;
+    gap: 14px;
+  }
+
+  .sim-arena,
+  .sim-combat-journal {
+    height: 470px;
+  }
+
+  .sim-combat-journal {
+    max-height: 470px;
+  }
+
+  .sim-health-card {
+    width: min(270px, 45%);
+    padding: 12px;
+  }
+
+  .sim-fighter-p1 .sim-ground-anchor {
+    --sprite-size: 160px;
+    --platform-width: 190px;
+  }
+
+  .sim-fighter-p2 .sim-ground-anchor {
+    --sprite-size: 138px;
+    --platform-width: 168px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .sim-catalog {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .sim-team-slots {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .sim-field-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sim-arena {
+    height: 480px;
+  }
+
+  .sim-combat-journal {
+    height: 290px;
+    max-height: 290px;
+  }
+
+  .sim-party,
+  .sim-bag {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sim-battle-moves {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .sim-two {
+    grid-template-columns: 1fr;
+  }
+
+  .sim-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .sim-menu-hero {
+    padding: 24px;
+  }
+
+  .sim-pokeball {
+    display: none;
+  }
+
+  .sim-panel {
+    padding: 16px;
+  }
+
+  .sim-catalog {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sim-catalog > button {
+    padding: 12px 8px;
+  }
+
+  .sim-team-slots {
+    gap: 8px;
+  }
+
+  .sim-team-edit {
+    min-height: 160px;
+    padding: 10px 6px;
+  }
+
+  .sim-team-edit img {
+    width: 65px;
+    height: 65px;
+  }
+
+  .sim-empty-slot {
+    min-height: 160px;
+  }
+
+  .sim-filters {
+    flex-wrap: wrap;
+  }
+
+  .sim-filters input {
+    min-width: 100% !important;
+  }
+
+  .sim-save-row,
+  .sim-saved-row {
+    flex-wrap: wrap;
+  }
+
+  .sim-editor-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sim-dialog-body {
+    padding: 16px;
+  }
+
+  .sim-dialog-head {
+    padding: 12px 16px;
+  }
+
+  .sim-move-picker {
+    grid-template-columns: 1fr;
+  }
+
+  .sim-battle-top label {
+    margin: 6px 0;
+  }
+
+  .sim-combat-journal {
+    padding: 0;
+  }
+}
+
+@media (max-width: 520px) {
+  .sim-arena {
+    height: 410px;
+    border-width: 4px;
+    border-radius: 8px;
+  }
+
+  .sim-arena-title {
+    left: 10px;
+    top: 12px;
+    font-size: 8px;
+  }
+
+  .sim-arena-title span {
+    font-size: 7px;
+  }
+
+  .sim-health-card {
+    width: 51%;
+    padding: 8px;
+    border-width: 2px;
+  }
+
+  .sim-health-heading {
+    gap: 5px;
+    margin-bottom: 7px;
+  }
+
+  .sim-health-card .sim-health-name {
+    font-size: 12px;
+  }
+
+  .sim-health-heading > span {
+    padding-top: 2px;
+    font-size: 9px;
+  }
+
+  .sim-health-meta > small {
+    font-size: 10px;
+  }
+
+  .sim-health-card .sim-type-list {
+    gap: 4px;
+  }
+
+  .sim-health-card .sim-health-type {
+    min-height: 23px;
+    padding: 3px 5px;
+    gap: 3px;
+    font-size: 10px;
+  }
+
+  .sim-type-emoji {
+    font-size: 12px;
+  }
+
+  .sim-health-card .sim-hp {
+    height: 12px;
+    margin: 8px 0 5px;
+  }
+
+  .sim-fighter-p2 .sim-health-card {
+    left: 3%;
+    top: 15%;
+  }
+
+  .sim-fighter-p1 .sim-health-card {
+    right: 3%;
+    bottom: 12%;
+  }
+
+  .sim-fighter-p1 .sim-ground-anchor {
+    left: 25%;
+    top: 78%;
+    --sprite-size: 128px;
+    --platform-width: 132px;
+  }
+
+  .sim-fighter-p2 .sim-ground-anchor {
+    left: 77%;
+    top: 47%;
+    --sprite-size: 114px;
+    --platform-width: 115px;
+  }
+
+  .sim-platform {
+    height: 36px;
+    border-width: 2px;
+  }
+
+  .sim-fighter-p2 .sim-platform {
+    height: 30px;
+  }
+
+  .sim-arena-caption {
+    padding: 10px;
+    font-size: 8px;
+  }
+
+  .sim-tera-badge,
+  .sim-status {
+    font-size: 9px;
+  }
+
+  .sim-party,
+  .sim-bag {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sim-battle-moves > button {
+    padding: 13px;
+    min-height: 120px;
+  }
+
+  .sim-battle-moves b {
+    font-size: 12px;
+  }
+
+  .sim-tabs {
+    gap: 5px;
+  }
+
+  .sim-tabs button {
+    font-size: 11px;
+    padding: 9px 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sim *,
+  .sim-dialog * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

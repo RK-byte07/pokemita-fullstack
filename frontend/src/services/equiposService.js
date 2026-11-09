@@ -1,4 +1,3 @@
-// frontend/src/services/equiposService.js
 import api from './api';
 
 export async function guardarEquipoAPI(nombre, teamData) {

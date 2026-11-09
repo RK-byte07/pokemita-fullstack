@@ -1,4 +1,3 @@
-// src/components/BattleArena.jsx
 import { useBattleStore } from "../store/battleStore";
 import { spriteUrl, TIPOS_COLORES } from "../utils/pokemon";
 

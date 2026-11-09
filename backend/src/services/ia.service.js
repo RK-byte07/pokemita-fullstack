@@ -1,4 +1,3 @@
-// backend/src/services/ia.service.js
 const HABILIDADES_OFENSIVAS = {
   'sheerforce': 1.3, 'adaptability': 1.3, 'toughclaws': 1.3,
   'strongjaw': 1.3, 'ironfist': 1.2, 'technician': 1.2,

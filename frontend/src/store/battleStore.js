@@ -1,4 +1,3 @@
-// frontend/src/store/battleStore.js
 import { create } from 'zustand';
 
 export const useBattleStore = create((set, get) => ({

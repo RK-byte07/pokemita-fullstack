@@ -1,227 +1,731 @@
-// backend/src/services/battle.service.js
-const Sim = require('pokemon-showdown');
-const { Teams } = require('pokemon-showdown');
-const { equipoP1, generarEquipoAleatorio } = require('./equipos.service');
-const { decidirAccion } = require('./ia.service');
+const { Battle } = require('pokemon-showdown');
+const { randomUUID } = require('node:crypto');
 
-const sessions = new Map();
+const teams = require('./simulator-teams');
 
-// ============================================================
-// MOCHILA
-// ============================================================
-function mochilaInicial() {
-  return {
-    potion:      { label: 'Pocion',        heal: 20,  usos: 3, icono: '🧪', desc: 'Recupera 20 HP', kind: 'heal' },
-    superpotion: { label: 'Super Pocion',  heal: 50,  usos: 2, icono: '🧴', desc: 'Recupera 50 HP', kind: 'heal' },
-    hyperpotion: { label: 'Hiper Pocion',  heal: 120, usos: 1, icono: '💊', desc: 'Recupera 120 HP', kind: 'heal' },
-    maxpotion:   { label: 'Pocion Maxima', heal: 999, usos: 1, icono: '⚗️', desc: 'HP completo', kind: 'heal' },
-    fullheal:    { label: 'Restaurador',   heal: 0,   usos: 1, icono: '🌟', desc: 'Cura estado', kind: 'status' },
-    revive:      { label: 'Revivir',       heal: 0,   usos: 1, icono: '💎', desc: 'Revive con 50% HP', kind: 'revive' },
-  };
-}
+const {
+  inventory,
+  checkItem,
+  bagFormat,
+} = require('./simulator-bag');
 
-function cerrarStream(stream) {
-  try {
-    if (typeof stream.pushEnd === 'function') stream.pushEnd();
-    else if (typeof stream.stop === 'function') stream.stop();
-    else if (typeof stream.end === 'function') stream.end();
-  } catch (e) {}
-}
+function decide(battle, side) {
+  const request = side.activeRequest;
 
-// ============================================================
-// CURACION
-// ============================================================
-function getActivePokemon(battle, sideIdx) {
-  if (!battle) return null;
-  const side = battle.sides[sideIdx];
-  if (!side || !side.active || !side.active[0]) return null;
-  return side.active[0];
-}
-
-function aplicarHeal(battle, sideIdx, heal, curarEstado) {
-  const poke = getActivePokemon(battle, sideIdx);
-  if (!poke) return { error: 'No hay Pokemon activo' };
-  if (poke.hp <= 0) return { error: 'El Pokemon esta debilitado. Usa Revivir' };
-
-  const eventos = [];
-  let aplicado = false;
-
-  if (heal > 0 && poke.hp < poke.maxhp) {
-    const cantidad = heal >= 999 ? poke.maxhp : Math.min(heal, poke.maxhp - poke.hp);
-    const hpAntes = poke.hp;
-    poke.sethp(poke.hp + cantidad);
-    const delta = poke.hp - hpAntes;
-    battle.add('-heal', poke, poke.hp, poke.maxhp, '[silent]');
-    eventos.push('|heal|' + poke.species.name + '|+' + delta);
-    aplicado = true;
+  if (!request || request.wait) {
+    return null;
   }
 
-  if (curarEstado && poke.status) {
-    const st = poke.status;
-    poke.clearVolatile();
-    poke.setStatus('');
-    battle.add('-curestatus', poke, st, '[silent]');
-    eventos.push('|cure|' + poke.species.name);
-    aplicado = true;
+  if (request.teamPreview) {
+    return `team ${side.pokemon
+      .map((_, index) => index + 1)
+      .join('')}`;
   }
 
-  if (!aplicado) return { error: 'No hay nada que curar (HP al maximo)' };
-  return { eventos };
+  if (request.forceSwitch) {
+    return 'default';
+  }
+
+  const actor = side.active[0];
+  const foe = side.foe.active[0];
+
+  const recovery = new Set([
+    'recover',
+    'roost',
+    'slackoff',
+    'softboiled',
+    'synthesis',
+    'moonlight',
+    'morningsun',
+    'shoreup',
+  ]);
+
+  const moves = request.active[0].moves
+    .map((move, index) => ({
+      ...move,
+      index: index + 1,
+    }))
+    .filter(
+      move =>
+        !move.disabled &&
+        move.pp !== 0,
+    );
+
+  const heal = moves.find(move =>
+    recovery.has(move.id),
+  );
+
+  if (
+    heal &&
+    actor.hp / actor.maxhp < 0.4
+  ) {
+    return `move ${heal.index}`;
+  }
+
+  function score(candidate) {
+    const move = battle.dex.moves.get(
+      candidate.id,
+    );
+
+    if (move.category === 'Status') {
+      return 0;
+    }
+
+    const types =
+      foe?.illusion && !foe.terastallized
+        ? foe.illusion.species.types
+        : foe?.getTypes() || [];
+
+    const effectiveness =
+      battle.dex.getImmunity(
+        move.type,
+        types,
+      )
+        ? 2 **
+          battle.dex.getEffectiveness(
+            move.type,
+            types,
+          )
+        : 0;
+
+    const attack =
+      move.category === 'Physical'
+        ? actor.getStat(
+            'atk',
+            false,
+            true,
+          )
+        : actor.getStat(
+            'spa',
+            false,
+            true,
+          );
+
+    return (
+      (move.basePower || 60) *
+      effectiveness *
+      (actor.hasType(move.type) ? 1.5 : 1) *
+      attack
+    );
+  }
+
+  const ranked = moves
+    .map(move => ({
+      ...move,
+      score: score(move),
+    }))
+    .sort((a, b) => b.score - a.score);
+
+  let selected = ranked[0];
+
+  const setup = moves.find(candidate => {
+    const boosts = battle.dex.moves.get(
+      candidate.id,
+    ).boosts;
+
+    return (
+      boosts &&
+      Object.entries(boosts).some(
+        ([key, value]) =>
+          value > 0 &&
+          actor.boosts[key] < 2,
+      )
+    );
+  });
+
+  if (
+    setup &&
+    actor.hp / actor.maxhp > 0.65 &&
+    battle.random(5) === 0
+  ) {
+    selected = setup;
+  }
+
+  if (!selected) return 'default';
+
+  const tera =
+    request.active[0].canTerastallize &&
+    actor.hp / actor.maxhp < 0.5 &&
+    selected.score > 0;
+
+  return `move ${selected.index}${
+    tera ? ' terastallize' : ''
+  }`;
 }
 
-function aplicarRevive(battle, sideIdx) {
-  if (!battle) return { error: 'Batalla no lista' };
-  const side = battle.sides[sideIdx];
-  if (!side) return { error: 'Lado no encontrado' };
+function perspective(lines, channel) {
+  const output = [];
 
-  for (let i = 0; i < side.pokemon.length; i++) {
-    const p = side.pokemon[i];
-    if (p.hp <= 0) {
-      p.sethp(Math.floor(p.maxhp / 2));
-      battle.add('-heal', p, p.hp, p.maxhp, '[silent]');
-      return { evento: '|revive|' + p.species.name + '|' + p.hp + '/' + p.maxhp };
+  for (
+    let index = 0;
+    index < lines.length;
+    index++
+  ) {
+    if (
+      lines[index].startsWith('|split|')
+    ) {
+      const owner =
+        lines[index].slice(7);
+
+      output.push(
+        lines[
+          index +
+            (owner === channel ? 1 : 2)
+        ],
+      );
+
+      index += 2;
+    } else {
+      output.push(lines[index]);
     }
   }
-  return { error: 'No hay Pokemon debilitados para revivir' };
+
+  return output.filter(Boolean);
 }
 
-// ============================================================
-// MOTOR DE BATALLA
-// ============================================================
-async function runBattleStreaming(stream, onEvent, options) {
-  options = options || {};
-  const onRequest = options.onRequest;
+class Session {
+  constructor({
+    mode = 'manual',
+    rules = 'bag',
+    team,
+    teamText,
+    seed,
+    opponentTeam,
+  } = {}) {
+    if (
+      !['manual', 'auto'].includes(mode) ||
+      !['bag', 'strict'].includes(rules)
+    ) {
+      throw new Error(
+        'Modo o reglas inválidos.',
+      );
+    }
 
-  stream.write('>start ' + JSON.stringify({ formatid: 'gen9ou' }));
-  stream.write('>player p1 ' + JSON.stringify({ name: 'Tu', team: options.teamP1 || equipoP1 }));
-  stream.write('>player p2 ' + JSON.stringify({ name: 'IA', team: options.teamP2 || generarEquipoAleatorio() }));
+    const checked = teams.validate(
+      team ||
+      teamText ||
+      teams.randomTeam(),
+    );
 
-  for await (const output of stream) {
-    for (const linea of output.split('\n')) {
-      if (!linea || linea.charAt(0) !== '|') continue;
-      const partes = linea.split('|');
-      const tipo = partes[1];
+    if (checked.errors.length) {
+      throw new Error(
+        checked.errors.join('\n'),
+      );
+    }
 
-      if (tipo !== 'request') onEvent(linea);
+    const checkedOpponent =
+      teams.validate(
+        opponentTeam ||
+        teams.randomTeam(),
+      );
 
-      if (tipo === 'request') {
-        let datos;
-        try { datos = JSON.parse(linea.slice(9)); } catch (e) { continue; }
-        const jugador = datos.side.id;
-        if (datos.teamPreview) { stream.write('>' + jugador + ' team 123456'); continue; }
-        if (datos.wait) continue;
-        if (onRequest) {
-          const decision = await onRequest(datos, jugador);
-          if (decision === null) return { done: true, reason: 'aborted' };
-          stream.write('>' + jugador + ' ' + decision);
-        } else {
-          stream.write('>' + jugador + ' ' + decidirAccion(datos, jugador));
+    if (
+      checkedOpponent.errors.length
+    ) {
+      throw new Error(
+        checkedOpponent.errors.join('\n'),
+      );
+    }
+
+    this.id = randomUUID();
+    this.mode = mode;
+    this.rules = rules;
+    this.version = 0;
+    this.position = 0;
+
+    this.bags = {
+      p1: inventory(),
+      p2: inventory(),
+    };
+
+    this.bag = this.bags.p1;
+    this.lastUsed = Date.now();
+
+    this.battle = new Battle({
+      formatid: 'gen9ou',
+      format:
+        rules === 'bag'
+          ? bagFormat()
+          : undefined,
+      seed,
+      p1: {
+        name:
+          mode === 'auto'
+            ? 'IA azul'
+            : 'Tú',
+        team: checked.team,
+      },
+      p2: {
+        name: 'IA roja',
+        team: checkedOpponent.team,
+      },
+    });
+
+    this.battle.pokemitaPending = {};
+    this.battle.pokemitaQueued = {};
+
+    this.initial = {
+      team: checked.team,
+      opponent: structuredClone(
+        this.battle.p2.team,
+      ),
+      seed: this.battle.prngSeed,
+    };
+
+    this.history = [];
+
+    if (mode === 'manual') {
+      this.pump();
+    }
+  }
+
+  chooseAI(side) {
+    const actor = side.active[0];
+    const bag = this.bags[side.id];
+
+    if (
+      this.rules === 'bag' &&
+      side.requestState === 'move' &&
+      actor?.hp > 0
+    ) {
+      let item;
+      let target = actor;
+
+      if (
+        actor.status &&
+        bag.fullheal.uses > 0 &&
+        this.battle.random(3) === 0
+      ) {
+        item = 'fullheal';
+      } else if (
+        actor.hp / actor.maxhp < 0.35
+      ) {
+        item = [
+          'hyperpotion',
+          'superpotion',
+          'potion',
+          'maxpotion',
+        ].find(
+          id => bag[id].uses > 0,
+        );
+      } else if (
+        bag.revive.uses > 0 &&
+        actor.hp / actor.maxhp > 0.65
+      ) {
+        const fainted =
+          side.pokemon.find(
+            pokemon => pokemon.fainted,
+          );
+
+        if (fainted) {
+          item = 'revive';
+          target = fainted;
         }
       }
-      if (tipo === 'win') { cerrarStream(stream); return { done: true, reason: 'win' }; }
+
+      if (item) {
+        this.battle.pokemitaPending[
+          side.id
+        ] = checkItem(
+          this.battle,
+          side.id,
+          bag,
+          item,
+          target.position,
+        );
+
+        if (
+          this.battle.choose(
+            side.id,
+            'default',
+          )
+        ) {
+          return;
+        }
+
+        delete this.battle
+          .pokemitaPending[side.id];
+      }
+    }
+
+    const action = decide(
+      this.battle,
+      side,
+    );
+
+    if (
+      action &&
+      !this.battle.choose(
+        side.id,
+        action,
+      ) &&
+      !this.battle.choose(
+        side.id,
+        'default',
+      )
+    ) {
+      throw new Error(
+        'La IA no pudo resolver su solicitud.',
+      );
     }
   }
-  return { done: true, reason: 'eof' };
-}
 
-// ============================================================
-// EXTRACCION DE DATOS
-// ============================================================
-function extractPlayerOptions(datos) {
-  if (datos.forceSwitch) {
-    const options = [];
-    datos.side.pokemon.forEach(function (p, i) {
-      if (i === 0) return;
-      if (p && p.condition.indexOf('faint') === -1) {
-        options.push({
-          action: 'switch ' + (i + 1),
-          label: p.ident.split(': ')[1],
-          hp: p.condition, kind: 'switch',
-        });
+  pump() {
+    for (
+      let index = 0;
+      index < 12 && !this.battle.ended;
+      index++
+    ) {
+      const side = this.battle.p2;
+
+      if (
+        !side.activeRequest ||
+        side.activeRequest.wait ||
+        side.isChoiceDone()
+      ) {
+        break;
       }
-    });
-    return { type: 'switch', options };
-  }
-  if (datos.active && datos.active[0]) {
-    const activo = datos.active[0];
-    const options = [];
-    if (activo.moves) {
-      activo.moves.forEach(function (m, i) {
-        options.push({
-          action: 'move ' + (i + 1),
-          label: m.move, pp: m.pp + '/' + m.maxpp,
-          disabled: m.disabled || m.pp === 0, kind: 'move',
-        });
-      });
+
+      this.chooseAI(side);
+
+      const player = this.battle.p1;
+
+      if (
+        player.activeRequest &&
+        !player.activeRequest.wait &&
+        !player.isChoiceDone()
+      ) {
+        break;
+      }
     }
-    datos.side.pokemon.forEach(function (p, i) {
-      if (i === 0) return;
-      if (p && p.condition.indexOf('faint') === -1) {
-        options.push({
-          action: 'switch ' + (i + 1),
-          label: p.ident.split(': ')[1],
-          hp: p.condition, kind: 'switch',
-        });
-      }
-    });
-    return { type: 'move', options };
   }
-  return null;
-}
 
-function extractTeamState(battle, sideIdx) {
-  if (!battle) return null;
-  const side = battle.sides[sideIdx];
-  if (!side) return null;
-  return side.pokemon.map(function (p) {
+  step() {
+    if (
+      this.mode !== 'auto' ||
+      this.battle.ended
+    ) {
+      return;
+    }
+
+    for (const id of ['p1', 'p2']) {
+      const side =
+        this.battle.getSide(id);
+
+      if (
+        side.activeRequest &&
+        !side.activeRequest.wait &&
+        !side.isChoiceDone()
+      ) {
+        this.chooseAI(side);
+      }
+    }
+
+    this.version++;
+
+    if (
+      this.battle.turn >= 800 &&
+      !this.battle.ended
+    ) {
+      this.battle.add(
+        'message',
+        'Límite de seguridad de 800 turnos.',
+      );
+
+      this.battle.tie();
+    }
+  }
+
+  act({
+    action,
+    version,
+    item,
+    target,
+  }) {
+    if (
+      this.mode !== 'manual' ||
+      this.battle.ended
+    ) {
+      throw new Error(
+        'La batalla no acepta acciones.',
+      );
+    }
+
+    if (version !== this.version) {
+      throw new Error(
+        'El turno cambió. Elige una acción de la solicitud actual.',
+      );
+    }
+
+    const side = this.battle.p1;
+
+    if (
+      !side.activeRequest ||
+      side.activeRequest.wait ||
+      side.isChoiceDone()
+    ) {
+      throw new Error(
+        'Espera la siguiente solicitud.',
+      );
+    }
+
+    let choice = action;
+
+    if (item) {
+      if (this.rules !== 'bag') {
+        throw new Error(
+          'La mochila está desactivada en OU estricto.',
+        );
+      }
+
+      this.battle.pokemitaPending.p1 =
+        checkItem(
+          this.battle,
+          'p1',
+          this.bag,
+          item,
+          target,
+        );
+
+      choice = 'default';
+    } else if (
+      typeof action !== 'string' ||
+      !/^(move [1-4]( terastallize)?|switch [1-6]|team [1-6]{6})$/.test(
+        action,
+      )
+    ) {
+      throw new Error(
+        'Acción no válida.',
+      );
+    }
+
+    if (
+      !this.battle.choose(
+        'p1',
+        choice,
+      )
+    ) {
+      delete this.battle
+        .pokemitaPending.p1;
+
+      throw new Error(
+        side.choice.error ||
+        'Showdown rechazó la acción.',
+      );
+    }
+
+    this.history.push({
+      turn: this.battle.turn,
+      action,
+      item,
+      target,
+    });
+
+    this.version++;
+    this.lastUsed = Date.now();
+
+    this.pump();
+  }
+
+  snapshot() {
+    const battle = this.battle;
+
+    const events = perspective(
+      battle.log.slice(this.position),
+      this.mode === 'manual'
+        ? 'p1'
+        : 'spectator',
+    );
+
+    this.position = battle.log.length;
+
+    function view(pokemon, own = false) {
+      const apparent =
+        !own && pokemon.illusion
+          ? pokemon.illusion.species
+          : pokemon.species;
+
+      return {
+        name: apparent.name,
+        sprite: apparent.spriteid,
+        types:
+          !own &&
+          pokemon.illusion &&
+          !pokemon.terastallized
+            ? apparent.types
+            : pokemon.getTypes(),
+        hp: own
+          ? pokemon.hp
+          : Math.ceil(
+              (
+                pokemon.hp /
+                pokemon.maxhp
+              ) * 100,
+            ),
+        maxhp: own
+          ? pokemon.maxhp
+          : 100,
+        exact: own,
+        status:
+          pokemon.status === 'fnt'
+            ? ''
+            : pokemon.status,
+        fainted: pokemon.fainted,
+        active: pokemon.isActive,
+        boosts: {
+          ...pokemon.boosts,
+        },
+        tera:
+          pokemon.terastallized ||
+          null,
+      };
+    }
+
+    const request =
+      battle.p1.activeRequest;
+
+    let controls = null;
+
+    if (
+      this.mode === 'manual' &&
+      !battle.ended &&
+      request &&
+      !request.wait &&
+      !battle.p1.isChoiceDone()
+    ) {
+      const active =
+        request.active?.[0];
+
+      controls = {
+        type: request.teamPreview
+          ? 'preview'
+          : request.forceSwitch
+            ? 'switch'
+            : 'move',
+        trapped: Boolean(
+          active?.trapped,
+        ),
+        tera:
+          active?.canTerastallize ||
+          null,
+        reviving: Boolean(
+          request.side?.pokemon.some(
+            pokemon =>
+              pokemon.reviving,
+          ),
+        ),
+        moves:
+          active?.moves.map(
+            (move, index) => ({
+              index: index + 1,
+              name: move.move,
+              id: move.id,
+              pp: move.pp ?? null,
+              maxpp:
+                move.maxpp ?? null,
+              disabled: Boolean(
+                move.disabled ||
+                move.pp === 0,
+              ),
+              type: battle.dex.moves.get(
+                move.id,
+              ).type,
+              power: battle.dex.moves.get(
+                move.id,
+              ).basePower,
+            }),
+          ) || [],
+      };
+    }
+
     return {
-      name: p.species.name,
-      hp: p.hp,
-      maxhp: p.maxhp,
-      fainted: p.hp <= 0,
-      active: side.active.indexOf(p) !== -1,
+      id: this.id,
+      version: this.version,
+      mode: this.mode,
+      rules: this.rules,
+      turn: battle.turn,
+      done: battle.ended,
+      winner: battle.winner || null,
+      events,
+      controls,
+
+      p1: battle.p1.active[0]
+        ? view(
+            battle.p1.active[0],
+            this.mode === 'manual',
+          )
+        : null,
+
+      p2: battle.p2.active[0]
+        ? view(battle.p2.active[0])
+        : null,
+
+      team: battle.p1.pokemon.map(
+        (pokemon, slot) => ({
+          ...view(
+            pokemon,
+            this.mode === 'manual',
+          ),
+          slot,
+        }),
+      ),
+
+      opponent:
+        battle.p2.pokemon.map(
+          pokemon => ({
+            name:
+              pokemon.species.name,
+            sprite:
+              pokemon.species.spriteid,
+            fainted: pokemon.fainted,
+          }),
+        ),
+
+      bag:
+        this.rules === 'bag'
+          ? Object.fromEntries(
+              Object.entries(
+                this.bag,
+              ).map(
+                ([key, value]) => [
+                  key,
+                  {
+                    ...value,
+                    heal:
+                      value.heal ===
+                      Infinity
+                        ? 'max'
+                        : value.heal ??
+                          null,
+                  },
+                ],
+              ),
+            )
+          : {},
+
+      field: {
+        weather: battle.field.weather,
+        terrain: battle.field.terrain,
+        effects: Object.keys(
+          battle.field.pseudoWeather,
+        ),
+        p1: Object.keys(
+          battle.p1.sideConditions,
+        ),
+        p2: Object.keys(
+          battle.p2.sideConditions,
+        ),
+      },
     };
-  });
-}
+  }
 
-// ============================================================
-// SESIONES
-// ============================================================
-function crearSesion() {
-  const sessionId = 'ses_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-  const stream = new Sim.BattleStream();
-  const session = {
-    stream,
-    events: [],
-    pendingRequest: null,
-    done: false,
-    mochila: mochilaInicial(),
-    battle: null,
-  };
-  sessions.set(sessionId, session);
-  return { sessionId, session };
-}
-
-function getSesion(id) {
-  return sessions.get(id);
-}
-
-function eliminarSesion(id) {
-  sessions.delete(id);
+  destroy() {
+    this.battle.destroy();
+  }
 }
 
 module.exports = {
-  sessions,
-  crearSesion,
-  getSesion,
-  eliminarSesion,
-  runBattleStreaming,
-  extractPlayerOptions,
-  extractTeamState,
-  aplicarHeal,
-  aplicarRevive,
-  mochilaInicial,
-  decidirAccion,
-  equipoP1,
-  generarEquipoAleatorio,
+  Session,
+  decide,
+  perspective,
 };

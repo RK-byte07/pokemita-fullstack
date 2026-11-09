@@ -1,4 +1,3 @@
-// backend/src/services/pokedex.service.js
 const Sim = require('pokemon-showdown');
 
 // ============================================================

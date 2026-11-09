@@ -1,4 +1,3 @@
-// backend/src/controllers/auth.controller.js
 const authService = require('../services/auth.service');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../services/auth.service');

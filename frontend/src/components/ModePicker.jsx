@@ -1,5 +1,3 @@
-// frontend/src/components/ModePicker.jsx
-
 import { useBattleStore } from "../store/battleStore";
 
 export default function ModePicker({ onAuto, onManual }) {

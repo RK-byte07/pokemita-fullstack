@@ -1,21 +1,45 @@
-// backend/src/middlewares/auth.middleware.js
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../services/auth.service');
+const jwt = require("jsonwebtoken");
+
+const {
+  JWT_SECRET,
+} = require("../services/auth.service");
 
 function verificarToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Formato: "Bearer TOKEN"
+  const authorization = req.headers.authorization || "";
+  const [scheme, token] = authorization.split(" ");
 
-  if (!token) {
-    return res.status(401).json({ error: 'Acceso denegado: no hay token' });
+  if (scheme !== "Bearer" || !token) {
+    return res.status(401).json({
+      error: "Acceso denegado: falta una sesión válida",
+    });
   }
 
   try {
-    const verificado = jwt.verify(token, JWT_SECRET);
-    req.usuario = verificado; // Guardamos los datos del usuario en la request
+    const payload = jwt.verify(token, JWT_SECRET);
+
+    if (
+      !payload ||
+      typeof payload !== "object" ||
+      !payload.id
+    ) {
+      return res.status(401).json({
+        error: "Token inválido",
+      });
+    }
+
+    if (payload.etapa) {
+      return res.status(401).json({
+        error:
+          "Debes completar la verificación de dos factores",
+      });
+    }
+
+    req.usuario = payload;
     next();
-  } catch (error) {
-    res.status(401).json({ error: 'Token inválido o expirado' });
+  } catch {
+    return res.status(401).json({
+      error: "Token inválido o expirado",
+    });
   }
 }
 

@@ -1,4 +1,3 @@
-// src/services/twofaService.js
 import api from './api';
 
 export async function generar2FAAPI() {

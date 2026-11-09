@@ -1,4 +1,3 @@
-// backend/src/controllers/2fa.controller.js
 const authService = require('../services/auth.service');
 
 async function generarQR(req, res) {
