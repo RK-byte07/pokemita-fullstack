@@ -1,0 +1,28 @@
+# render.yaml — Blueprint para desplegar el BACKEND (Express + WebSockets) en Render.
+# El frontend (React + Vite) se despliega aparte en Netlify usando netlify.toml.
+services:
+  - type: web
+    name: pokemita-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm ci
+    startCommand: node server.js
+    healthCheckPath: /api/pokemon-list   # ruta GET pública para verificar que el server vive
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true            # secreto aleatorio gestionado por Render
+      # --- Base de datos: Render Database (PostgreSQL/MySQL) o PlanetScale ---
+      # Si usas una BD externa, define aqui las variables que lea src/db.js:
+      # - key: DB_HOST
+      #   sync: false
+      # - key: DB_USER
+      #   sync: false
+      # - key: DB_PASSWORD
+      #   sync: false
+      # - key: DB_NAME
+      #   sync: false
