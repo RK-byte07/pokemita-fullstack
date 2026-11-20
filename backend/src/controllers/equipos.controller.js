@@ -1,4 +1,3 @@
-// backend/src/controllers/equipos.controller.js
 const db = require('../db');
 
 // Guardar un equipo nuevo

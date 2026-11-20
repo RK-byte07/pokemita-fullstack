@@ -1,5 +1,3 @@
-// frontend/src/components/BattleLog.jsx
-
 import { useEffect, useRef } from "react";
 import { useBattleStore } from "../store/battleStore";
 

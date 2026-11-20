@@ -1,10 +1,5 @@
-// backend/src/services/equipos.service.js
 const { Teams } = require('pokemon-showdown');
 
-// ============================================================
-// Pool de Pokémon del meta Gen 9 OU para la IA
-// Cada set incluye su habilidad, objeto y movimientos competitivos
-// ============================================================
 const OU_POOL = [
   `Great Tusk @ Heavy-Duty Boots
 Ability: Protosynthesis
@@ -109,7 +104,7 @@ Adamant Nature
 Ability: Regenerator
 EVs: 252 HP / 252 Def / 4 SpD
 Bold Nature
-- Scald
+- Surf
 - Recover
 - Haze
 - Toxic`,
@@ -142,7 +137,7 @@ Jolly Nature
 - Rapid Spin`,
 
   `Garganacl @ Leftovers
-Ability: Salt Cure
+Ability: Purifying Salt
 EVs: 252 HP / 4 Def / 252 SpD
 Careful Nature
 - Salt Cure
@@ -215,7 +210,7 @@ Jolly Nature
 
   `Hatterene @ Leftovers
 Ability: Magic Bounce
-EVs: 252 HP / 4 Def / 252 SpD
+EVs: 252 HP / 4 SpA / 252 SpD
 Calm Nature
 - Psychic
 - Dazzling Gleam
@@ -223,19 +218,18 @@ Calm Nature
 - Healing Wish`,
 ];
 
-// ============================================================
-// Generar equipo aleatorio de 6 Pokémon del pool OU
-// ============================================================
+// Exportaciones conservadas para compatibilidad.
+// El simulador nuevo utiliza randomTeam() de simulator-teams.js.
 function generarEquipoAleatorio() {
-  const shuffled = OU_POOL.slice().sort(() => Math.random() - 0.5);
-  const seleccionados = shuffled.slice(0, 6);
-  const texto = seleccionados.join('\n\n');
-  return Teams.pack(Teams.import(texto));
+  const shuffled = OU_POOL
+    .slice()
+    .sort(() => Math.random() - 0.5);
+
+  return Teams.pack(
+    Teams.import(shuffled.slice(0, 6).join('\n\n')),
+  );
 }
 
-// ============================================================
-// Equipo por defecto del jugador (se puede sobrescribir)
-// ============================================================
 const teamP1Text = `
 Garchomp @ Choice Scarf
 Ability: Rough Skin
@@ -292,7 +286,9 @@ Timid Nature
 - Nasty Plot
 `;
 
-const equipoP1 = Teams.pack(Teams.import(teamP1Text));
+const equipoP1 = Teams.pack(
+  Teams.import(teamP1Text),
+);
 
 module.exports = {
   equipoP1,

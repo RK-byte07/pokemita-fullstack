@@ -1,4 +1,3 @@
-// src/services/battleService.js
 import api from './api';
 
 export async function fetchPokemonList() {

@@ -1,4 +1,3 @@
-// backend/src/controllers/2fa.controller.js
 const authService = require('../services/auth.service');
 
 async function generarQR(req, res) {
@@ -19,5 +18,5 @@ async function activar(req, res) {
     res.status(400).json({ error: error.message });
   }
 }
-
+//seguridad
 module.exports = { generarQR, activar };

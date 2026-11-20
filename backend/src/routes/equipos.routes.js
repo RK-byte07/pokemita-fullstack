@@ -1,4 +1,4 @@
-// backend/src/routes/equipos.routes.js
+
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/equipos.controller');

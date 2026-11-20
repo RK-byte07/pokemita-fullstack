@@ -1,4 +1,3 @@
-// backend/src/routes/2fa.routes.js
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/2fa.controller');

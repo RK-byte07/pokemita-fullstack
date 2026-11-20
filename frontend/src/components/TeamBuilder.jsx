@@ -1,4 +1,3 @@
-// src/components/TeamBuilder.jsx
 import { useState, useEffect } from 'react';
 import { useBattleStore } from '../store/battleStore';
 import { useAuth } from '../context/AuthContext';

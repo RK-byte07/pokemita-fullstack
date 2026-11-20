@@ -1,4 +1,3 @@
-// backend/src/controllers/pokemon.controller.js
 const pokedex = require('../services/pokedex.service');
 
 function getPokemonList(req, res) {

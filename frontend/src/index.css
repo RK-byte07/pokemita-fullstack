@@ -3,10 +3,6 @@
 @tailwind utilities;
 
 
-/* =========================
-   RESET
-========================= */
-
 * {
   box-sizing: border-box;
 }
