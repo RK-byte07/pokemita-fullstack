@@ -18,5 +18,5 @@ async function activar(req, res) {
     res.status(400).json({ error: error.message });
   }
 }
-
+//seguridad
 module.exports = { generarQR, activar };

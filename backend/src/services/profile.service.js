@@ -224,16 +224,17 @@ async function profile(userId, rules, page) {
     [userId],
   );
 
-  const [users] = await db.execute(
-    `SELECT username,
-            email,
-            phone,
-            bio,
-            avatar_pokemon,
-            created_at,
-            twofa_enabled
-     FROM usuarios
-     WHERE id = ?`,
+    const [users] = await db.execute(
+    `SELECT u.username,
+            u.email,
+            u.phone,
+            COALESCE(p.bio, '') AS bio,
+            COALESCE(p.avatar_pokemon, 'pikachu') AS avatar_pokemon,
+            u.created_at,
+            u.twofa_enabled
+     FROM usuarios u
+     LEFT JOIN perfiles_usuario p ON p.usuario_id = u.id
+     WHERE u.id = ?`,
     [userId],
   );
 
