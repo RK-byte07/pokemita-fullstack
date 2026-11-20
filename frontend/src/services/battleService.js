@@ -31,9 +31,13 @@ export async function sendAction(sessionId, action) {
  * Lee el stream y llama onEvent por cada evento.
  */
 export async function streamAutoBattle(onEvent, onError) {
-  const battleUrl = import.meta.env.PROD
-    ? '/api/battle'
-    : 'http://localhost:3000/api/battle';
+  // Misma lógica que en services/api.js: binding VITE_BACKEND_URL en Vercel,
+  // ruta /api en el mismo origen como fallback, localhost en desarrollo.
+  const battleUrl = new URL(
+    'battle',
+    import.meta.env.VITE_BACKEND_URL ||
+      (import.meta.env.PROD ? '/api/' : 'http://localhost:3000/api/'),
+  ).toString();
   const response = await fetch(battleUrl);
   const reader = response.body.getReader();
   const decoder = new TextDecoder();

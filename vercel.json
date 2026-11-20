@@ -3,22 +3,26 @@
   "services": {
     "backend": {
       "root": "backend",
-      "framework": "express"
+      "framework": "express",
+      "entrypoint": "server.js"
     },
     "frontend": {
       "root": "frontend",
-      "framework": "vite"
+      "framework": "vite",
+      "bindings": [
+        { "type": "service", "service": "backend", "format": "url", "env": "BACKEND_URL" }
+      ]
     }
   },
   "rewrites": [
     {
-      "source": "/ws",
+      "source": "/api/(.*)",
       "destination": {
         "service": "backend"
       }
     },
     {
-      "source": "/api/(.*)",
+      "source": "/ws",
       "destination": {
         "service": "backend"
       }

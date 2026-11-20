@@ -92,9 +92,12 @@ export const useBattleStore = create((set, get) => ({
   // ---- ACCIONES DE WEBSOCKET ----
   // ==========================================
 
-   connectSocket: (onEvent, onRequest, initialMessage) => {
-    // En producción (Vercel) el WebSocket del backend es público y vive en
-    // la ruta /ws del mismo dominio (rewrite "/ws" -> servicio backend).
+  connectSocket: (onEvent, onRequest, initialMessage) => {
+    // WebSocket del backend (servicio interno en Vercel). En producción se
+    // conecta a la URL pública /ws del mismo dominio (rewrite "/ws" ->
+    // servicio backend); el binding BACKEND_URL no sirve aquí porque solo
+    // está disponible en funciones del servidor, no en el navegador.
+    // En desarrollo local se usa ws://localhost:3000.
     const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = import.meta.env.PROD
       ? `${wsProto}//${window.location.host}/ws`
