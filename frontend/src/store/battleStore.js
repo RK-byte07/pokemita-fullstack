@@ -1,5 +1,10 @@
 import { create } from 'zustand';
 
+// URL del WebSocket derivada de VITE_API_URL (Netlify/Render usan wss://).
+const API_ORIGIN =
+  import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const WS_URL = `${API_ORIGIN.replace(/^http/, 'ws')}`;
+
 export const useBattleStore = create((set, get) => ({
   // Modo actual: 'menu' | 'building' | 'battle'
   mode: 'menu',
@@ -92,7 +97,7 @@ export const useBattleStore = create((set, get) => ({
   // ==========================================
 
    connectSocket: (onEvent, onRequest, initialMessage) => {
-    const ws = new WebSocket('ws://localhost:3000');
+    const ws = new WebSocket(WS_URL);
     
     ws.onopen = () => {
       console.log('✅ Conectado al WebSocket');

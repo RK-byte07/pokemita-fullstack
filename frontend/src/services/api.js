@@ -1,7 +1,13 @@
 import axios from 'axios';
 
+// URL del backend (Render). En local usa http://localhost:3000;
+// en produccion se define VITE_API_URL al construir en Netlify,
+// ej: https://pokemita-backend.onrender.com
+const API_ORIGIN =
+  import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: `${API_ORIGIN}/api`,
   timeout: 15000,
 });
 

@@ -30,7 +30,9 @@ export async function sendAction(sessionId, action) {
  * Lee el stream y llama onEvent por cada evento.
  */
 export async function streamAutoBattle(onEvent, onError) {
-  const response = await fetch('http://localhost:3000/api/battle');
+  const API_ORIGIN =
+    import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const response = await fetch(`${API_ORIGIN}/api/battle`);
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
