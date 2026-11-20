@@ -93,7 +93,13 @@ export const useBattleStore = create((set, get) => ({
   // ==========================================
 
    connectSocket: (onEvent, onRequest, initialMessage) => {
-    const ws = new WebSocket('ws://localhost:3000');
+    // En producción (Vercel) el WebSocket del backend es público y vive en
+    // la ruta /ws del mismo dominio (rewrite "/ws" -> servicio backend).
+    const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = import.meta.env.PROD
+      ? `${wsProto}//${window.location.host}/ws`
+      : 'ws://localhost:3000';
+    const ws = new WebSocket(wsUrl);
     
     ws.onopen = () => {
       console.log('✅ Conectado al WebSocket');

@@ -1,8 +1,11 @@
 // frontend/src/services/api.js
 import axios from 'axios';
 
+// En producción (Vercel) el backend se sirve bajo el mismo dominio en /api
+// gracias al rewrite de vercel.json. En desarrollo local se usa el backend
+// de nodemon en http://localhost:3000.
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: import.meta.env.PROD ? '/api' : 'http://localhost:3000/api',
   timeout: 15000,
 });
 
