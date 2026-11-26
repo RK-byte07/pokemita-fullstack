@@ -1,11 +1,14 @@
 const mysql = require('mysql2/promise');
 
+// Configuracion via variables de entorno (Render). Con valores por defecto
+// para desarrollo local con XAMPP.
 const pool = mysql.createPool({
-  host: 'localhost',
+  host: process.env.DB_HOST || 'localhost',
+  port: Number(process.env.DB_PORT || 3306),
   timezone: 'Z',
-  user: 'root',
-  password: '',
-  database: 'pokemita_db',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'pokemita_db',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

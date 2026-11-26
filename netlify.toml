@@ -1,0 +1,18 @@
+# netlify.toml — configuración de despliegue del FRONTEND (React + Vite)
+# Netlify solo publica la SPA; el backend (Express + WebSockets) corre en Render.
+
+[build]
+  base = "frontend"            # carpeta donde está el package.json del frontend
+  publish = "dist"             # salida de `vite build`
+  command = "npm run build"
+
+# Node 20 en el entorno de build de Netlify
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA fallback: cualquier ruta (/, /login, /equipos...) sirve index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
