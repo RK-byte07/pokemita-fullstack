@@ -15,7 +15,7 @@ const links = [
   ['/simulador', 'Simulador', 'sword'],
   ['/meta', 'Meta competitivo', 'trophy'],
   ['/guias', 'Guías', 'book'],
-  ['/contacto', 'Contacto', 'mail'],
+  
 ];
 
 export default function Navbar() {

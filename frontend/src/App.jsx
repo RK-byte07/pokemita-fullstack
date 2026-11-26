@@ -13,7 +13,6 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Wiki from './pages/Wiki';
 import Simulador from './pages/Simulador';
-import Contact from './pages/Contact';
 import Pokedex from './pages/pokedex';
 import Meta from './pages/Meta';
 import Perfil from './pages/Perfil';
@@ -40,10 +39,7 @@ export default function App() {
                 element={<Pokedex />}
               />
               <Route path="/meta" element={<Meta />} />
-              <Route
-                path="/contacto"
-                element={<Contact />}
-              />
+              
 
               <Route element={<ProtectedRoute />}>
                 <Route
